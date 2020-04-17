@@ -9,14 +9,16 @@ class VAE(nn.Module):
     def __init__(self, 
                  input_size, 
                  output_size,
-                 hidden_sizes=400,
+                 action_size,
+                 hidden_size=400,
                  activation=F.relu,  
     ):
         super(VAE, self).__init__()
     
         self.input_size = input_size
         self.output_size = output_size
-        self.hidden_sizes = hidden_sizes
+        self.action_size = action_size
+        self.hidden_size = hidden_size
         self.activation = activation
         self.embedding_size = input_size
 
@@ -27,12 +29,12 @@ class VAE(nn.Module):
         ])
 
         # Set embedding layers
-        self.embedding_layer1 = nn.Linear(self.hidden_size, embedding_size)
-        self.embedding_layer2 = nn.Linear(self.hidden_size, embedding_size)
+        self.embedding_layer1 = nn.Linear(self.hidden_size, self.embedding_size)
+        self.embedding_layer2 = nn.Linear(self.hidden_size, self.embedding_size)
         
         # Set decoder layers
-        self.encoder_layers = nn.ModuleList([
-            nn.Linear(self.embedding_size, self.hidden_size),
+        self.decoder_layers = nn.ModuleList([
+            nn.Linear(self.embedding_size + self.action_size, self.hidden_size),
             nn.Linear(self.hidden_size, self.hidden_size)
         ])
 
@@ -50,6 +52,7 @@ class VAE(nn.Module):
         return mu + std * eps
 
     def decode(self, z, a):
+        x = torch.cat([z,a], dim=-1)
         for decoder_layer in self.decoder_layers:
             x = self.activation(decoder_layer(x))
         return self.output_layer(x)

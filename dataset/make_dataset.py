@@ -1,10 +1,13 @@
 import gym
+import torch
 import pickle
 import argparse
 import numpy as np
 
 # Configurations
 parser = argparse.ArgumentParser(description='Make a dataset in MuJoCo environment from a uniformly random policy')
+parser.add_argument('--env', type=str, default='Hopper-v2', 
+                    help='choose an environment between Hopper-v2 and HalfCheetah-v2')
 parser.add_argument('--path', type=str, default=None,
                     help='path to save the dataset')
 parser.add_argument('--d_size', type=int, default=100000,
@@ -12,7 +15,7 @@ parser.add_argument('--d_size', type=int, default=100000,
 args = parser.parse_args()
 
 # Initialize environment
-env = gym.make('Hopper-v2')
+env = gym.make(args.env)
 obs_dim = env.observation_space.shape[0]
 act_dim = env.action_space.shape[0]
 print('State dimension:', obs_dim)
