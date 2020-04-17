@@ -1,9 +1,16 @@
 import gym
 import pickle
+import argparse
 import numpy as np
 
+# Configurations
+parser = argparse.ArgumentParser(description='Make a dataset in MuJoCo environment from a uniformly random policy')
+parser.add_argument('--path', type=str, default=None)
+parser.add_argument('--d_size', type=int, default=100000)
+args = parser.parse_args()
+
 # Initialize environment
-env = gym.make('HalfCheetah-v2')
+env = gym.make('Hopper-v2')
 obs_dim = env.observation_space.shape[0]
 act_dim = env.action_space.shape[0]
 print('State dimension:', obs_dim)
@@ -13,7 +20,6 @@ print('Action dimension:', act_dim)
 env.seed(0)
 np.random.seed(0)
 
-dataset_size = 1000000
 dataset = []
 
 while True:
@@ -27,19 +33,17 @@ while True:
         if not done:
             dataset.append((obs, action, next_obs))
             temp = np.array(dataset)
-            if temp.shape[0] >= dataset_size:
+            if temp.shape[0] >= args.d_size:
                 break
 
         obs = next_obs
  
     # Save dataset
-    if temp.shape[0] >= dataset_size:
-        with open('halfcheetah_dataset_1000000.pickle', 'wb') as f:
-            pickle.dump(dataset, f)
+    if temp.shape[0] >= args.d_size:
+        pickle.dump(dataset, open(args.path, "wb"))
         break
 
 # Load dataset
-with open('halfcheetah_dataset_1000000.pickle', 'rb') as f:
-    dataset = pickle.load(f)
-    dataset = np.array(dataset)
-    print(dataset.shape)
+dataset = pickle.load(open(args.path, "rb"))
+dataset = np.array(dataset)
+print(dataset.shape)
