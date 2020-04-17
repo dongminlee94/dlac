@@ -13,7 +13,7 @@ print('Action dimension:', act_dim)
 env.seed(0)
 np.random.seed(0)
 
-dataset_size = 100000
+dataset_size = 500000
 dataset = []
 
 while True:
@@ -34,12 +34,12 @@ while True:
  
     # Save dataset
     if temp.shape[0] >= dataset_size:
-        with open('halfcheetah_dataset_100000.pickle', 'wb') as f:
+        with open('halfcheetah_dataset_500000.pickle', 'wb') as f:
             pickle.dump(dataset, f)
         break
 
 # Load dataset
-with open('halfcheetah_dataset_100000.pickle', 'rb') as f:
+with open('halfcheetah_dataset_500000.pickle', 'rb') as f:
     dataset = pickle.load(f)
     dataset = np.array(dataset)
     print(dataset.shape)
