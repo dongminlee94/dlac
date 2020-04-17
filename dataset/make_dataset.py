@@ -5,8 +5,10 @@ import numpy as np
 
 # Configurations
 parser = argparse.ArgumentParser(description='Make a dataset in MuJoCo environment from a uniformly random policy')
-parser.add_argument('--path', type=str, default=None)
-parser.add_argument('--d_size', type=int, default=100000)
+parser.add_argument('--path', type=str, default=None,
+                    help='path to save the dataset')
+parser.add_argument('--d_size', type=int, default=100000,
+                    help='dataset size')
 args = parser.parse_args()
 
 # Initialize environment
