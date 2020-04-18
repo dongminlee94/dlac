@@ -19,8 +19,8 @@ class VAE(nn.Module):
         self.output_size = output_size
         self.action_size = action_size
         self.hidden_size = hidden_size
-        self.activation = activation
         self.embedding_size = input_size
+        self.activation = activation
 
         # Set encoder layers
         self.encoder_layers = nn.ModuleList([
