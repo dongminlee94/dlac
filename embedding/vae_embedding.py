@@ -22,11 +22,11 @@ parser.add_argument('--env', type=str, default='Hopper-v2',
 parser.add_argument('--path', type=str, default=None, 
                     help='path to load the dataset')
 parser.add_argument('--seed', type=int, default=0, 
-                    help='seed for random number generators')
+                    help='seed for random number generators (default: 0)')
 parser.add_argument('--epochs', type=int, default=50, 
-                    help='number of epochs to train')
+                    help='number of epochs to train (default: 50)')
 parser.add_argument('--batch_size', type=int, default=128, 
-                    help='input batch size for training')
+                    help='input batch size for training (default: 128)')
 args = parser.parse_args()
 
 def main():
@@ -60,10 +60,13 @@ def main():
     writer = SummaryWriter(log_dir=dir_name)
 
     start_time = time.time()
+    
+    sum_losses = 0.
+    num_count = 0
 
     # Start training
     for epoch in range(args.epochs):
-        for obs, action, next_obs in data_loader:
+        for i, (obs, action, next_obs) in enumerate(data_loader):
             if 0: # Check shape of transition experiences
                 print(obs.shape)
                 print(action.shape)
@@ -74,7 +77,7 @@ def main():
             # Compute reconstruction loss and kl divergence
             reconst_loss = F.mse_loss(pred_next_obs, next_obs.float(), size_average=False)
             # For KL divergence, see Appendix B from VAE paper: https://arxiv.org/abs/1312.6114
-            # 0.5 * sum(1 + log(sigma^2) - mu^2 - sigma^2)
+            # - 0.5 * sum(1 + log(sigma^2) - mu^2 - sigma^2)
             kld = - 0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp()).to(device)
 
             # Update VAE model parameters
@@ -83,36 +86,39 @@ def main():
             loss.backward()
             optimizer.step()
 
-            # Save losses
+            # Compute average loss
+            sum_losses += loss.item()
+            num_count += 1
+            average_loss = sum_losses / num_count
+
+            if (i + 1) % 10 == 0:
+                print('---------------------------------------')
+                print('Epoch: [{}/{}]'.format(epoch+1, args.epochs))
+                print('Step: [{}/{}]'.format(i+1, len(data_loader)))
+                print('AverageLoss: {:.4f}'.format(average_loss))
+                print('Loss: {:.4f}'.format(loss.item()))
+                print('Reconst: {:.4f}'.format(reconst_loss.item()))
+                print('KL: {:.4f}'.format(kld.item()))
+                print('Time:', int(time.time() - start_time))
+                print('---------------------------------------')
     
         # Log experiment result for training steps
-    #     writer.add_scalar('Train/AverageReturns', train_average_return, total_num_steps)
-    #     writer.add_scalar('Train/EpisodeReturns', train_episode_return, total_num_steps)
+        writer.add_scalar('AverageLoss', average_loss, epoch)
+        writer.add_scalar('EpochLoss', loss, epoch)
 
-    #     print('---------------------------------------')
-    #     print('Iterations:', i)
-    #     print('Steps:', total_num_steps)
-    #     print('Episodes:', train_num_episodes)
-    #     print('AverageReturn:', round(train_average_return, 2))
-    #     print('EvalEpisodes:', eval_num_episodes)
-    #     print('EvalAverageReturn:', round(eval_average_return, 2))
-    #     print('OtherLogs:', agent.logger)
-    #     print('Time:', int(time.time() - start_time))
-    #     print('---------------------------------------')
-
-    # # Save a training model
-    # if (i > 0) and (i % 10 == 0):
-    #     if not os.path.exists('./tests/save_model'):
-    #         os.mkdir('./tests/save_model')
-        
-    #     ckpt_path = os.path.join('./tests/save_model/' + args.env + '_' + args.algo \
-    #                                                                     + '_i_' + str(i) \
-    #                                                                     + '_st_' + str(total_num_steps) \
-    #                                                                     + '_tr_' + str(round(train_average_return, 2)) \
-    #                                                                     + '_er_' + str(round(eval_average_return, 2)) \
-    #                                                                     + '_t_' + str(int(time.time() - start_time)) + '.pt')
-        
-    #     torch.save(agent.actor.state_dict(), ckpt_path)
+        # Save the trained model
+        if (epoch + 1) % 10 == 0:
+            if not os.path.exists('./asset'):
+                os.mkdir('./asset')
+            
+            ckpt_path = os.path.join('./asset/' + args.env \
+                                                + '_ep_' + str(epoch+1) \
+                                                + '_al_' + str(round(average_loss, 2)) \
+                                                + '_el_' + str(round(loss.item(), 2)) \
+                                                + '_t_' + str(int(time.time() - start_time)) 
+                                                + '.pt')
+            
+            torch.save(model.state_dict(), ckpt_path)
 
 if __name__ == "__main__":
     main()
