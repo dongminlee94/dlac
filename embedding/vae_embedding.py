@@ -111,7 +111,7 @@ def main():
         os.mkdir('./asset')
     
     ckpt_path = os.path.join('./asset/' + args.env \
-                                        + '_ep_' + str(epoch+1) \
+                                        + '_ep_' + str(args.epochs) \
                                         + '_al_' + str(round(average_loss, 2)) \
                                         + '_el_' + str(round(loss.item(), 2)) \
                                         + '_t_' + str(int(time.time() - start_time)) 
