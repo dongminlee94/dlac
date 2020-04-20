@@ -57,8 +57,8 @@ def main():
 
     # Create a SummaryWriter object by TensorBoard
     dir_name = 'runs/' + args.env + '/' + str(np.array(dataset).shape[0]) \
-                                  + '/' + str(args.epochs) \
-                                  + '/' + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+                                  + '_' + str(args.epochs) \
+                                  + '_' + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     writer = SummaryWriter(log_dir=dir_name)
 
     start_time = time.time()
