@@ -105,19 +105,19 @@ def main():
         writer.add_scalar('AverageLoss', average_loss, epoch)
         writer.add_scalar('EpochLoss', loss, epoch)
 
-        # Save the trained model
-        if (epoch + 1) % 10 == 0:
-            if not os.path.exists('./asset'):
-                os.mkdir('./asset')
-            
-            ckpt_path = os.path.join('./asset/' + args.env \
-                                                + '_ep_' + str(epoch+1) \
-                                                + '_al_' + str(round(average_loss, 2)) \
-                                                + '_el_' + str(round(loss.item(), 2)) \
-                                                + '_t_' + str(int(time.time() - start_time)) 
-                                                + '.pt')
-            
-            torch.save(model.state_dict(), ckpt_path)
+    # Save the trained model
+    # if (epoch + 1) % 50 == 0:
+    if not os.path.exists('./asset'):
+        os.mkdir('./asset')
+    
+    ckpt_path = os.path.join('./asset/' + args.env \
+                                        + '_ep_' + str(epoch+1) \
+                                        + '_al_' + str(round(average_loss, 2)) \
+                                        + '_el_' + str(round(loss.item(), 2)) \
+                                        + '_t_' + str(int(time.time() - start_time)) 
+                                        + '.pt')
+    
+    torch.save(model.state_dict(), ckpt_path)
 
 if __name__ == "__main__":
     main()
