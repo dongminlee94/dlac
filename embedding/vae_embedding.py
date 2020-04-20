@@ -110,12 +110,12 @@ def main():
     if not os.path.exists('../asset'):
         os.mkdir('../asset')
     
-    ckpt_path = os.path.join('../asset/' + args.env \
-                                        + '_ep_' + str(args.epochs) \
-                                        + '_al_' + str(round(average_loss, 2)) \
-                                        + '_el_' + str(round(loss.item(), 2)) \
-                                        + '_t_' + str(int(time.time() - start_time)) 
-                                        + '.pt')
+    ckpt_path = os.path.join('../asset/' + args.path \
+                                         + '_ep_' + str(args.epochs) \
+                                         + '_al_' + str(round(average_loss, 2)) \
+                                         + '_el_' + str(round(loss.item(), 2)) \
+                                         + '_t_' + str(int(time.time() - start_time)) 
+                                         + '.pt')
     
     torch.save(model.state_dict(), ckpt_path)
 
