@@ -47,12 +47,12 @@ class VAE(nn.Module):
         return self.embedding_layer1(x), self.embedding_layer2(x)
 
     def reparameterize(self, mu, logvar):
-        std = torch.exp(logvar/2).to(device)
-        eps = torch.randn_like(std).to(device)
+        std = torch.exp(logvar/2)
+        eps = torch.randn_like(std)
         return mu + std * eps
 
     def decode(self, z, a):
-        x = torch.cat([z,a], dim=-1)
+        x = torch.cat([z,a], dim=-1).to(device)
         for decoder_layer in self.decoder_layers:
             x = self.activation(decoder_layer(x))
         return self.output_layer(x)
