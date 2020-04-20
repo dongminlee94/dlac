@@ -72,7 +72,7 @@ def main():
                 print(action.shape)
                 print(next_obs.shape)
             
-            pred_next_obs, mu, logvar = model(obs.to(device).float(), action)
+            pred_next_obs, mu, logvar = model(obs.to(device).float(), action.to(device))
 
             # Compute reconstruction loss and kl divergence
             reconst_loss = F.mse_loss(pred_next_obs, next_obs.to(device).float(), size_average=False)
