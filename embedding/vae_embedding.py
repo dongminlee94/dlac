@@ -64,8 +64,10 @@ def main():
 
     start_time = time.time()
     
-    sum_losses = 0.
     num_count = 0
+    sum_losses = 0.
+    sum_reconst = 0.
+    sum_kld = 0.
 
     # Start training
     for epoch in range(args.epochs):
@@ -78,21 +80,26 @@ def main():
             pred_next_obs, mu, logvar = model(obs.to(device).float(), action.to(device))
 
             # Compute reconstruction loss and kl divergence
-            reconst_loss = F.mse_loss(pred_next_obs, next_obs.to(device).float(), size_average=False)
+            reconst = F.mse_loss(pred_next_obs, next_obs.to(device).float(), size_average=False)
             # For KL divergence, see Appendix B from VAE paper: https://arxiv.org/abs/1312.6114
             # - 0.5 * sum(1 + log(sigma^2) - mu^2 - sigma^2)
             kld = - 0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp()).to(device)
 
             # Update VAE model parameters
-            loss = reconst_loss + 1e-4 * kld
+            loss = reconst + 1e-4 * kld
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
 
-            # Compute average loss
-            sum_losses += loss.item()
+            # Compute average losses
             num_count += 1
+            sum_losses += loss.item()
+            sum_reconst += reconst.item()
+            sum_kld += kld.item()
+
             average_loss = sum_losses / num_count
+            average_reconst = sum_reconst / num_count
+            average_kld = sum_kld / num_count
 
             if (i + 1) % 100 == 0:
                 print('---------------------------------------')
@@ -100,7 +107,9 @@ def main():
                 print('Step: [{}/{}]'.format(i+1, len(data_loader)))
                 print('AverageLoss: {:.4f}'.format(average_loss))
                 print('Loss: {:.4f}'.format(loss.item()))
-                print('Reconst: {:.4f}'.format(reconst_loss.item()))
+                print('AverageReconst: {:.4f}'.format(average_reconst))
+                print('Reconst: {:.4f}'.format(reconst.item()))
+                print('AverageKL: {:.4f}'.format(average_kld))
                 print('KL: {:.4f}'.format(kld.item()))
                 print('Time:', int(time.time() - start_time))
                 print('---------------------------------------')
@@ -108,6 +117,10 @@ def main():
         # Log experiment result for training steps
         writer.add_scalar('AverageLoss', average_loss, epoch)
         writer.add_scalar('EpochLoss', loss, epoch)
+        writer.add_scalar('AverageReconst', average_reconst, epoch)
+        writer.add_scalar('EpochReconst', reconst, epoch)
+        writer.add_scalar('AverageKL', average_kld, epoch)
+        writer.add_scalar('EpochKL', kld, epoch)
 
     # Save the trained model
     if not os.path.exists('../asset'):
