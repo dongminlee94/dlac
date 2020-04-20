@@ -75,7 +75,7 @@ def main():
             pred_next_obs, mu, logvar = model(obs.float(), action)
 
             # Compute reconstruction loss and kl divergence
-            reconst_loss = F.mse_loss(pred_next_obs, next_obs.float(), reduction='sum')
+            reconst_loss = F.mse_loss(pred_next_obs, next_obs.float(), size_average=False)
             # For KL divergence, see Appendix B from VAE paper: https://arxiv.org/abs/1312.6114
             # - 0.5 * sum(1 + log(sigma^2) - mu^2 - sigma^2)
             kld = - 0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp()).to(device)
