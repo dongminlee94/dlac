@@ -56,7 +56,9 @@ def main():
     optimizer = optim.Adam(model.parameters(), lr=1e-4)
 
     # Create a SummaryWriter object by TensorBoard
-    dir_name = 'runs/' + args.env + '/' + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+    dir_name = 'runs/' + args.env + '/' + str(np.array(dataset).shape[0]) \
+                                  + '/' + str(args.epochs) \
+                                  + '/' + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     writer = SummaryWriter(log_dir=dir_name)
 
     start_time = time.time()
