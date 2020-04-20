@@ -13,7 +13,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 from model import VAE
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
 
 # Configurations
 parser = argparse.ArgumentParser(description='VAE Embedding')
