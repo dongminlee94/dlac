@@ -13,7 +13,6 @@ from torch.utils.tensorboard import SummaryWriter
 
 from model import VAE
 
-device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
 
 # Configurations
 parser = argparse.ArgumentParser(description='VAE Embedding')
@@ -27,7 +26,9 @@ parser.add_argument('--epochs', type=int, default=50,
                     help='number of epochs to train (default: 50)')
 parser.add_argument('--batch_size', type=int, default=128, 
                     help='input batch size for training (default: 128)')
+parser.add_argument('--gpu_index', type=int, default=0, metavar='N')
 args = parser.parse_args()
+device = torch.device('cuda', index=args.gpu_index) if torch.cuda.is_available() else torch.device('cpu')
 
 def main():
     # Initialize an environment
@@ -55,8 +56,8 @@ def main():
     optimizer = optim.Adam(model.parameters(), lr=1e-4)
 
     # Create a SummaryWriter object by TensorBoard
-    # dir_name = 'runs/' + args.env + '/' + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-    # writer = SummaryWriter(log_dir=dir_name)
+    dir_name = 'runs/' + args.env + '/' + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+    writer = SummaryWriter(log_dir=dir_name)
 
     start_time = time.time()
     
@@ -102,23 +103,22 @@ def main():
                 print('---------------------------------------')
     
         # Log experiment result for training steps
-        # writer.add_scalar('AverageLoss', average_loss, epoch)
-        # writer.add_scalar('EpochLoss', loss, epoch)
+        writer.add_scalar('AverageLoss', average_loss, epoch)
+        writer.add_scalar('EpochLoss', loss, epoch)
 
     # Save the trained model
-    # if (epoch + 1) % 50 == 0:
-    # if not os.path.exists('../asset'):
-    #     os.mkdir('../asset')
+    if not os.path.exists('../asset'):
+        os.mkdir('../asset')
     
-    # ckpt_path = os.path.join('../asset/' + args.env \
-    #                                      + '_ds_' + str(np.array(dataset).shape[0]) \
-    #                                      + '_ep_' + str(args.epochs) \
-    #                                      + '_al_' + str(round(average_loss, 2)) \
-    #                                      + '_el_' + str(round(loss.item(), 2)) \
-    #                                      + '_t_' + str(int(time.time() - start_time)) 
-    #                                      + '.pt')
+    ckpt_path = os.path.join('../asset/' + args.env \
+                                         + '_ds_' + str(np.array(dataset).shape[0]) \
+                                         + '_ep_' + str(args.epochs) \
+                                         + '_al_' + str(round(average_loss, 2)) \
+                                         + '_el_' + str(round(loss.item(), 2)) \
+                                         + '_t_' + str(int(time.time() - start_time)) 
+                                         + '.pt')
     
-    # torch.save(model.state_dict(), ckpt_path)
+    torch.save(model.state_dict(), ckpt_path)
 
 if __name__ == "__main__":
     main()
