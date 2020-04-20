@@ -31,12 +31,13 @@ args = parser.parse_args()
 device = torch.device('cuda', index=args.gpu_index) if torch.cuda.is_available() else torch.device('cpu')
 
 def main():
-    # Initialize an environment
-    env = gym.make(args.env)
-    obs_dim = env.observation_space.shape[0]
-    act_dim = env.action_space.shape[0]
-    print('State dimension:', obs_dim)
-    print('Action dimension:', act_dim)
+    # Set the shapes of observation space and action space in the environment
+    if args.env == 'Hopper-v2':
+        obs_dim = 11
+        act_dim = 3
+    elif args.env == 'HalfCheetah-v2':
+        obs_dim = 17
+        act_dim = 6
 
     # Set a random seed
     np.random.seed(args.seed)
