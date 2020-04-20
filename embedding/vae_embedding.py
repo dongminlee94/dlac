@@ -91,7 +91,7 @@ def main():
             num_count += 1
             average_loss = sum_losses / num_count
 
-            if (i + 1) % 10 == 0:
+            if (i + 1) % 100 == 0:
                 print('---------------------------------------')
                 print('Epoch: [{}/{}]'.format(epoch+1, args.epochs))
                 print('Step: [{}/{}]'.format(i+1, len(data_loader)))
