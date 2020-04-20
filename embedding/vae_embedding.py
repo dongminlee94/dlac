@@ -55,8 +55,8 @@ def main():
     optimizer = optim.Adam(model.parameters(), lr=1e-4)
 
     # Create a SummaryWriter object by TensorBoard
-    dir_name = 'runs/' + args.env + '/' + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-    writer = SummaryWriter(log_dir=dir_name)
+    # dir_name = 'runs/' + args.env + '/' + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+    # writer = SummaryWriter(log_dir=dir_name)
 
     start_time = time.time()
     
@@ -102,23 +102,23 @@ def main():
                 print('---------------------------------------')
     
         # Log experiment result for training steps
-        writer.add_scalar('AverageLoss', average_loss, epoch)
-        writer.add_scalar('EpochLoss', loss, epoch)
+        # writer.add_scalar('AverageLoss', average_loss, epoch)
+        # writer.add_scalar('EpochLoss', loss, epoch)
 
     # Save the trained model
     # if (epoch + 1) % 50 == 0:
-    if not os.path.exists('../asset'):
-        os.mkdir('../asset')
+    # if not os.path.exists('../asset'):
+    #     os.mkdir('../asset')
     
-    ckpt_path = os.path.join('../asset/' + args.env \
-                                         + '_ds_' + str(np.array(dataset).shape[0]) \
-                                         + '_ep_' + str(args.epochs) \
-                                         + '_al_' + str(round(average_loss, 2)) \
-                                         + '_el_' + str(round(loss.item(), 2)) \
-                                         + '_t_' + str(int(time.time() - start_time)) 
-                                         + '.pt')
+    # ckpt_path = os.path.join('../asset/' + args.env \
+    #                                      + '_ds_' + str(np.array(dataset).shape[0]) \
+    #                                      + '_ep_' + str(args.epochs) \
+    #                                      + '_al_' + str(round(average_loss, 2)) \
+    #                                      + '_el_' + str(round(loss.item(), 2)) \
+    #                                      + '_t_' + str(int(time.time() - start_time)) 
+    #                                      + '.pt')
     
-    torch.save(model.state_dict(), ckpt_path)
+    # torch.save(model.state_dict(), ckpt_path)
 
 if __name__ == "__main__":
     main()
