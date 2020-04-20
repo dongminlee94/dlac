@@ -1,5 +1,4 @@
 import os
-import gym
 import time
 import pickle
 import argparse
