@@ -52,7 +52,7 @@ class VAE(nn.Module):
         return mu + std * eps
 
     def decode(self, z, a):
-        x = torch.cat([z,a], dim=-1).to(device)
+        x = torch.cat([z,a], dim=-1)
         for decoder_layer in self.decoder_layers:
             x = self.activation(decoder_layer(x))
         return self.output_layer(x)
