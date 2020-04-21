@@ -8,7 +8,6 @@ from agents.common.utils import *
 from agents.common.buffer import *
 from agents.common.networks import *
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class Agent(object):
    """An implementation of the Proximal Policy Optimization (PPO) (by clipping) agent."""
@@ -59,15 +58,17 @@ class Agent(object):
       self.entropies = entropies
       self.logger = logger
 
+      self.device = torch.device('cuda', index=self.args.gpu_index) if torch.cuda.is_available() else torch.device('cpu')
+
       # Main network
-      self.actor = GaussianPolicy(self.obs_dim, self.act_dim).to(device)
-      self.critic = MLP(self.obs_dim, 1, activation=torch.tanh).to(device)
+      self.actor = GaussianPolicy(self.obs_dim, self.act_dim).to(self.device)
+      self.critic = MLP(self.obs_dim, 1, activation=torch.tanh).to(self.device)
       
       # If true, set the trained embedding model 
       if self.args.mode == 'embed':
          embedding_model_path = os.path.join('../../embedding/asset/' + str(self.args.path))
-         embedding_model = torch.load(embedding_model_path).to(device)
-         self.model = DynamicsEmbedding(self.obs_dim, self.obs_dim, self.act_dim).to(device)
+         embedding_model = torch.load(embedding_model_path).to(self.device)
+         self.model = DynamicsEmbedding(self.obs_dim, self.obs_dim, self.act_dim).to(self.device)
          self.model.load_state_dict(embedding_model)
 
       # Create optimizers
@@ -167,24 +168,24 @@ class Agent(object):
       # Keep interacting until agent reaches a terminal state.
       while not (done or step_number == max_step):
          if self.eval_mode:
-            action, _, _, _ = self.actor(torch.Tensor(obs).to(device))
+            action, _, _, _ = self.actor(torch.Tensor(obs).to(self.device))
             action = action.detach().cpu().numpy()
             next_obs, reward, done, _ = self.env.step(action)
          else:
             if args.mode == 'raw':
                # Collect experience (s, a, r, s') using some policy
-               _, _, _, action = self.actor(torch.Tensor(obs).to(device))
+               _, _, _, action = self.actor(torch.Tensor(obs).to(self.device))
                action = action.detach().cpu().numpy()
                next_obs, reward, done, _ = self.env.step(action)
                
                self.steps += 1
 
                # Add experience to buffer
-               val = self.critic(torch.Tensor(obs).to(device))
+               val = self.critic(torch.Tensor(obs).to(self.device))
                self.buffer.add(obs, action, reward, done, val)
             elif args.mode == 'embed':
                # Collect experience (z_s, a, r, z_s') using some policy
-               z_obs = self.model.encode(torch.Tensor(obs).to(device))[0]
+               z_obs = self.model.encode(torch.Tensor(obs).to(self.device))[0]
                _, _, _, action = self.actor(z_obs)
                action = action.detach().cpu().numpy()
                next_obs, reward, done, _ = self.env.step(action)
@@ -192,7 +193,7 @@ class Agent(object):
                self.steps += 1
 
                # Add experience to buffer
-               val = self.critic(torch.Tensor(obs).to(device))
+               val = self.critic(torch.Tensor(obs).to(self.device))
                self.buffer.add(z_obs, action, reward, done, val)
 
             # Start training when the number of experience is equal to sample size
