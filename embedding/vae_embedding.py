@@ -59,7 +59,7 @@ def main():
     dir_name = 'runs/' + args.env + '/' \
                                   + 'ds_' + str(np.array(dataset).shape[0]) \
                                   + '_ep_' + str(args.epochs) \
-                                  + '_t_' + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+                                  + '_1e-3_t_' + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     writer = SummaryWriter(log_dir=dir_name)
 
     start_time = time.time()
@@ -131,7 +131,7 @@ def main():
                                          + '_ep_' + str(args.epochs) \
                                          + '_al_' + str(round(average_loss, 2)) \
                                          + '_el_' + str(round(loss.item(), 2)) \
-                                         + '_t_' + str(int(time.time() - start_time)) 
+                                         + '_1e-3_t_' + str(int(time.time() - start_time)) 
                                          + '.pt')
     
     torch.save(model.state_dict(), ckpt_path)
