@@ -86,7 +86,7 @@ def main():
             kld = - 0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp()).to(device)
 
             # Update VAE model parameters
-            loss = reconst + 1e-4 * kld
+            loss = reconst + 1e-3 * kld   # default: 1e-4
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
