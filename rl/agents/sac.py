@@ -19,10 +19,10 @@ class Agent(object):
    def __init__(self,
                 env,
                 args,
+                device,
                 obs_dim,
                 act_dim,
                 act_limit,
-                device,
                 steps=0,
                 gamma=0.99,
                 alpha=0.2,
@@ -43,10 +43,10 @@ class Agent(object):
 
       self.env = env
       self.args = args
+      self.device = device
       self.obs_dim = obs_dim
       self.act_dim = act_dim
       self.act_limit = act_limit
-      self.device = device
       self.steps = steps 
       self.gamma = gamma
       self.alpha = alpha
@@ -90,7 +90,7 @@ class Agent(object):
       self.qf2_optimizer = optim.Adam(self.qf2.parameters(), lr=self.qf_lr)
       
       # Experience buffer
-      self.replay_buffer = ReplayBuffer(self.obs_dim, self.act_dim, self.buffer_size)
+      self.replay_buffer = ReplayBuffer(self.obs_dim, self.act_dim, self.buffer_size, self.device)
 
       # If automatic entropy tuning is True, 
       # initialize a target entropy, a log alpha and an alpha optimizer

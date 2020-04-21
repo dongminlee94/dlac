@@ -16,10 +16,10 @@ class Agent(object):
    def __init__(self,
                 env,
                 args,
+                device,
                 obs_dim,
                 act_dim,
                 act_limit,
-                device,
                 steps=0,
                 gamma=0.99,
                 lam=0.97,
@@ -40,10 +40,10 @@ class Agent(object):
 
       self.env = env
       self.args = args
+      self.device = device
       self.obs_dim = obs_dim
       self.act_dim = act_dim
       self.act_limit = act_limit
-      self.device = device
       self.steps = steps 
       self.gamma = gamma
       self.lam = lam
@@ -77,7 +77,7 @@ class Agent(object):
       self.critic_optimizer = optim.Adam(self.critic.parameters(), lr=self.critic_lr)
       
       # Experience buffer
-      self.buffer = Buffer(self.obs_dim, self.act_dim, self.sample_size, self.gamma, self.lam)
+      self.buffer = Buffer(self.obs_dim, self.act_dim, self.sample_size, self.device, self.gamma, self.lam)
 
    def train_model(self):
       batch = self.buffer.get()

@@ -56,13 +56,13 @@ def main():
 
     # Create an agent
     if args.algo == 'sac':                                                        
-        agent = Agent(env, args, obs_dim, act_dim, act_limit, device,
+        agent = Agent(env, args, device, obs_dim, act_dim, act_limit, 
                     hidden_sizes=(300,300), buffer_size=int(1e6), batch_size=100, alpha=0.2)   
     elif args.algo == 'asac':
-        agent = Agent(env, args, obs_dim, act_dim, act_limit, device,
+        agent = Agent(env, args, device, obs_dim, act_dim, act_limit, 
                     hidden_sizes=(300,300), buffer_size=int(1e6), batch_size=100, automatic_entropy_tuning=True)
     elif args.algo == 'ppo':
-        agent = Agent(env, args, obs_dim, act_dim, act_limit, device, sample_size=4000)
+        agent = Agent(env, args, device, obs_dim, act_dim, act_limit, sample_size=4000)
 
     # Create a SummaryWriter object by TensorBoard
     dir_name = 'runs/' + args.env + '/' \
