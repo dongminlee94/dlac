@@ -95,7 +95,7 @@ def main():
             num_count += 1
             sum_losses += loss.item()
             sum_reconst += reconst.item()
-            sum_kld += kld
+            sum_kld += kld.item()
 
             average_loss = sum_losses / num_count
             average_reconst = sum_reconst / num_count
@@ -110,7 +110,7 @@ def main():
                 print('AverageReconst: {:.4f}'.format(average_reconst))
                 print('Reconst: {:.4f}'.format(reconst.item()))
                 print('AverageKL: {:.4f}'.format(average_kld))
-                print('KL: {:.4f}'.format(kld))
+                print('KL: {:.4f}'.format(kld.item()))
                 print('Time:', int(time.time() - start_time))
                 print('---------------------------------------')
     
