@@ -21,8 +21,8 @@ parser.add_argument('--path', type=str, default=None,
                     help='path to load the dataset')
 parser.add_argument('--seed', type=int, default=0, 
                     help='seed for random number generators (default: 0)')
-parser.add_argument('--epochs', type=int, default=50, 
-                    help='number of epochs to train (default: 50)')
+parser.add_argument('--epochs', type=int, default=500, 
+                    help='number of epochs to train (default: 500)')
 parser.add_argument('--batch_size', type=int, default=128, 
                     help='input batch size for training (default: 128)')
 parser.add_argument('--gpu_index', type=int, default=0, metavar='N')
