@@ -32,7 +32,7 @@ if args.algo == 'ppo':
     from agents.ppo import Agent
 elif args.algo == 'sac':
     from agents.sac import Agent
-elif args.algo == 'asac': # Automating entropy adjustment on SAC
+else args.algo == 'asac': # Automating entropy adjustment on SAC
     from agents.sac import Agent
 
 def main():
@@ -51,7 +51,7 @@ def main():
     torch.manual_seed(args.seed)
 
     # Create an agent
-    elif args.algo == 'sac':                                                        
+    if args.algo == 'sac':                                                        
         agent = Agent(env, args, obs_dim, act_dim, act_limit,
                     hidden_sizes=(300,300), buffer_size=int(1e6), batch_size=100, alpha=0.2)   
     elif args.algo == 'asac':
