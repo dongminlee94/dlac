@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-class VAE(nn.Module):
+class DynamicsEmbedding(nn.Module):
     def __init__(self, 
                  input_size, 
                  output_size,
@@ -11,7 +11,7 @@ class VAE(nn.Module):
                  hidden_size=400,
                  activation=F.relu,  
     ):
-        super(VAE, self).__init__()
+        super(DynamicsEmbedding, self).__init__()
     
         self.input_size = input_size
         self.output_size = output_size

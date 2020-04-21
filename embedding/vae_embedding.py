@@ -10,11 +10,11 @@ import torch.optim as optim
 import torch.nn.functional as F
 from torch.utils.tensorboard import SummaryWriter
 
-from model import VAE
+from model import DynamicsEmbedding
 
 
 # Configurations
-parser = argparse.ArgumentParser(description='VAE Embedding')
+parser = argparse.ArgumentParser(description='Dynamics-adaptive Embedding')
 parser.add_argument('--env', type=str, default='Hopper-v2', 
                     help='choose an environment between Hopper-v2 and HalfCheetah-v2')
 parser.add_argument('--path', type=str, default=None, 
@@ -51,8 +51,8 @@ def main():
                                               shuffle=True,
                                               drop_last=True)
 
-    # Set VAE model and an optimizer
-    model = VAE(obs_dim, obs_dim, act_dim).to(device)
+    # Set embedding model and an optimizer
+    model = DynamicsEmbedding(obs_dim, obs_dim, act_dim).to(device)
     optimizer = optim.Adam(model.parameters(), lr=1e-4)
 
     # Create a SummaryWriter object by TensorBoard
@@ -123,10 +123,10 @@ def main():
         writer.add_scalar('Train/EpochKL', kld, epoch)
 
     # Save the trained model
-    if not os.path.exists('../asset'):
-        os.mkdir('../asset')
+    if not os.path.exists('./asset'):
+        os.mkdir('./asset')
     
-    ckpt_path = os.path.join('../asset/' + args.env \
+    ckpt_path = os.path.join('./asset/' + args.env \
                                          + '_ds_' + str(np.array(dataset).shape[0]) \
                                          + '_ep_' + str(args.epochs) \
                                          + '_al_' + str(round(average_loss, 2)) \
