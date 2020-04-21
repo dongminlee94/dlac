@@ -196,12 +196,12 @@ class Agent(object):
       while not (done or step_number == max_step):
          self.steps += 1
          
-         if self.eval_mode:
-            action, _, _ = self.actor(torch.Tensor(obs).to(self.device))
-            action = action.detach().cpu().numpy()
-            next_obs, reward, done, _ = self.env.step(action)
-         else:
-            if self.args.mode == 'raw':
+         if self.args.mode == 'raw':
+            if self.eval_mode:
+               action, _, _ = self.actor(torch.Tensor(obs).to(self.device))
+               action = action.detach().cpu().numpy()
+               next_obs, reward, done, _ = self.env.step(action)
+            else:
                # Collect experience (s, a, r, s') using some policy
                _, action, _ = self.actor(torch.Tensor(obs).to(self.device))
                action = action.detach().cpu().numpy()
@@ -209,7 +209,15 @@ class Agent(object):
 
                # Add experience to replay buffer
                self.replay_buffer.add(obs, action, reward, next_obs, done)
-            elif self.args.mode == 'embed':
+         elif self.args.mode == 'embed':
+            if self.eval_mode:
+               z_obs = self.model.encode(torch.Tensor(obs).to(self.device))[0]
+               z_obs = z_obs.detach().cpu().numpy()
+
+               action, _, _ = self.actor(torch.Tensor(z_obs).to(self.device))
+               action = action.detach().cpu().numpy()
+               next_obs, reward, done, _ = self.env.step(action)
+            else:
                # Collect experience (z_s, a, r, z_s') using some policy
                z_obs = self.model.encode(torch.Tensor(obs).to(self.device))[0]
                z_obs = z_obs.detach().cpu().numpy()
@@ -223,9 +231,10 @@ class Agent(object):
 
                # Add experience to replay buffer
                self.replay_buffer.add(z_obs, action, reward, z_next_obs, done)
-            # Start training when the number of experience is greater than batch size
-            if self.steps > self.batch_size:
-               self.train_model()
+               
+               # Start training when the number of experience is greater than batch size
+               if self.steps > self.batch_size:
+                  self.train_model()
 
          total_reward += reward
          step_number += 1

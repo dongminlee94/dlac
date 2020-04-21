@@ -168,12 +168,13 @@ class Agent(object):
 
       # Keep interacting until agent reaches a terminal state.
       while not (done or step_number == max_step):
-         if self.eval_mode:
-            action, _, _, _ = self.actor(torch.Tensor(obs).to(self.device))
-            action = action.detach().cpu().numpy()
-            next_obs, reward, done, _ = self.env.step(action)
-         else:
-            if self.args.mode == 'raw':
+         
+         if self.args.mode == 'raw':
+            if self.eval_mode:
+               action, _, _, _ = self.actor(torch.Tensor(obs).to(self.device))
+               action = action.detach().cpu().numpy()
+               next_obs, reward, done, _ = self.env.step(action)
+            else:
                # Collect experience (s, a, r, s') using some policy
                _, _, _, action = self.actor(torch.Tensor(obs).to(self.device))
                action = action.detach().cpu().numpy()
@@ -184,7 +185,15 @@ class Agent(object):
                # Add experience to buffer
                val = self.critic(torch.Tensor(obs).to(self.device))
                self.buffer.add(obs, action, reward, done, val)
-            elif self.args.mode == 'embed':
+         elif self.args.mode == 'embed':
+            if self.eval_mode:
+               z_obs = self.model.encode(torch.Tensor(obs).to(self.device))[0]
+               z_obs = z_obs.detach().cpu().numpy()
+
+               action, _, _, _ = self.actor(torch.Tensor(z_obs).to(self.device))
+               action = action.detach().cpu().numpy()
+               next_obs, reward, done, _ = self.env.step(action)
+            else:   
                # Collect experience (z_s, a, r, z_s') using some policy
                z_obs = self.model.encode(torch.Tensor(obs).to(self.device))[0]
                z_obs = z_obs.detach().cpu().numpy()
@@ -199,11 +208,11 @@ class Agent(object):
                val = self.critic(torch.Tensor(obs).to(self.device))
                self.buffer.add(z_obs, action, reward, done, val)
 
-            # Start training when the number of experience is equal to sample size
-            if self.steps == self.sample_size:
-               self.buffer.finish_path()
-               self.train_model()
-               self.steps = 0
+               # Start training when the number of experience is equal to sample size
+               if self.steps == self.sample_size:
+                  self.buffer.finish_path()
+                  self.train_model()
+                  self.steps = 0
 
          total_reward += reward
          step_number += 1
