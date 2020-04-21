@@ -28,6 +28,7 @@ parser.add_argument('--max_step', type=int, default=1000,
 parser.add_argument('--gpu_index', type=int, default=0, metavar='N')
 parser.add_argument('--dataset', type=str, default='100000')
 parser.add_argument('--epochs', type=str, default='500')
+parser.add_argument('--kld', type=str, default='1e-5')
 args = parser.parse_args()
 
 if args.algo == 'ppo':
@@ -67,6 +68,7 @@ def main():
                                   + args.algo \
                                   + '_' + args.dataset \
                                   + '_' + args.epochs \
+                                  + '_' + args.kld \
                                   + '_' + str(args.seed) \
                                   + '_' + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     writer = SummaryWriter(log_dir=dir_name)
@@ -138,6 +140,7 @@ def main():
             ckpt_path = os.path.join('./asset/' + args.env + '_' + args.algo \
                                                                  + args.dataset \
                                                                  + args.epochs \
+                                                                 + args.kld \
                                                                  + '_i_' + str(i) \
                                                                  + '_st_' + str(total_num_steps) \
                                                                  + '_tr_' + str(round(train_average_return, 2)) \
