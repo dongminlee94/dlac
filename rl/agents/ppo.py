@@ -4,9 +4,9 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 
-from agents.common.utils import *
-from agents.common.buffer import *
-from agents.common.networks import *
+from rl.common.utils import *
+from rl.common.buffer import *
+from rl.common.networks import *
 
 
 class Agent(object):
