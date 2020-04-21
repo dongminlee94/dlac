@@ -173,7 +173,7 @@ class Agent(object):
             action = action.detach().cpu().numpy()
             next_obs, reward, done, _ = self.env.step(action)
          else:
-            if args.mode == 'raw':
+            if self.args.mode == 'raw':
                # Collect experience (s, a, r, s') using some policy
                _, _, _, action = self.actor(torch.Tensor(obs).to(self.device))
                action = action.detach().cpu().numpy()
@@ -184,7 +184,7 @@ class Agent(object):
                # Add experience to buffer
                val = self.critic(torch.Tensor(obs).to(self.device))
                self.buffer.add(obs, action, reward, done, val)
-            elif args.mode == 'embed':
+            elif self.args.mode == 'embed':
                # Collect experience (z_s, a, r, z_s') using some policy
                z_obs = self.model.encode(torch.Tensor(obs).to(self.device))[0]
                _, _, _, action = self.actor(z_obs)
