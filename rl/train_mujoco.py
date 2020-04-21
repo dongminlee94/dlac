@@ -64,7 +64,7 @@ def main():
 
     # Create a SummaryWriter object by TensorBoard
     dir_name = 'runs/' + args.env + '/' \
-                                  + '_' + args.algo \
+                                  + args.algo \
                                   + '_' + args.dataset \
                                   + '_' + args.epochs \
                                   + '_' + str(args.seed) \
