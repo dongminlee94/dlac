@@ -63,11 +63,12 @@ class Agent(object):
       self.actor = GaussianPolicy(self.obs_dim, self.act_dim).to(device)
       self.critic = MLP(self.obs_dim, 1, activation=torch.tanh).to(device)
       
-      # Set the trained embedding model 
-      embedding_model_path = os.path.join('../../asset/' + str(self.args.path))
-      embedding_model = torch.load(embedding_model_path).to(device)
-      self.model = DynamicsEmbedding(self.obs_dim, self.obs_dim, self.act_dim).to(device)
-      self.model.load_state_dict(embedding_model)
+      # If true, set the trained embedding model 
+      if self.args.mode == 'embed':
+         embedding_model_path = os.path.join('../../embedding/asset/' + str(self.args.path))
+         embedding_model = torch.load(embedding_model_path).to(device)
+         self.model = DynamicsEmbedding(self.obs_dim, self.obs_dim, self.act_dim).to(device)
+         self.model.load_state_dict(embedding_model)
 
       # Create optimizers
       self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=self.actor_lr)
