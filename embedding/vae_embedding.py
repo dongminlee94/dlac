@@ -59,7 +59,7 @@ def main():
     dir_name = 'runs/' + args.env + '/' \
                                   + 'ds_' + str(np.array(dataset).shape[0]) \
                                   + '_ep_' + str(args.epochs) \
-                                  + '_1e-3_t_' + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+                                  + '_1e-2_t_' + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     writer = SummaryWriter(log_dir=dir_name)
 
     start_time = time.time()
@@ -86,7 +86,7 @@ def main():
             kld = - 0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp()).to(device)
 
             # Update VAE model parameters
-            loss = reconst + 1e-3 * kld   # default: 1e-4
+            loss = reconst + 1e-2 * kld   # default: 1e-4
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -115,12 +115,12 @@ def main():
                 print('---------------------------------------')
     
         # Log experiment result for training steps
-        writer.add_scalar('AverageLoss', average_loss, epoch)
-        writer.add_scalar('EpochLoss', loss, epoch)
-        writer.add_scalar('AverageReconst', average_reconst, epoch)
-        writer.add_scalar('EpochReconst', reconst, epoch)
-        writer.add_scalar('AverageKL', average_kld, epoch)
-        writer.add_scalar('EpochKL', kld, epoch)
+        writer.add_scalar('Train/AverageLoss', average_loss, epoch)
+        writer.add_scalar('Train/EpochLoss', loss, epoch)
+        writer.add_scalar('Train/AverageReconst', average_reconst, epoch)
+        writer.add_scalar('Train/EpochReconst', reconst, epoch)
+        writer.add_scalar('Train/AverageKL', average_kld, epoch)
+        writer.add_scalar('Train/EpochKL', kld, epoch)
 
     # Save the trained model
     if not os.path.exists('../asset'):
@@ -131,7 +131,7 @@ def main():
                                          + '_ep_' + str(args.epochs) \
                                          + '_al_' + str(round(average_loss, 2)) \
                                          + '_el_' + str(round(loss.item(), 2)) \
-                                         + '_1e-3_t_' + str(int(time.time() - start_time)) 
+                                         + '_1e-2_t_' + str(int(time.time() - start_time)) 
                                          + '.pt')
     
     torch.save(model.state_dict(), ckpt_path)
