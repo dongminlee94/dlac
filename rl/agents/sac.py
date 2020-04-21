@@ -22,6 +22,7 @@ class Agent(object):
                 obs_dim,
                 act_dim,
                 act_limit,
+                device,
                 steps=0,
                 gamma=0.99,
                 alpha=0.2,
@@ -45,6 +46,7 @@ class Agent(object):
       self.obs_dim = obs_dim
       self.act_dim = act_dim
       self.act_limit = act_limit
+      self.device = device
       self.steps = steps 
       self.gamma = gamma
       self.alpha = alpha
@@ -61,8 +63,6 @@ class Agent(object):
       self.qf2_losses = qf2_losses
       self.alpha_losses = alpha_losses
       self.logger = logger
-
-      self.device = torch.device('cuda', index=self.args.gpu_index) if torch.cuda.is_available() else torch.device('cpu')
 
       # Main network
       self.actor = ReparamGaussianPolicy(self.obs_dim, self.act_dim, hidden_sizes=self.hidden_sizes, 

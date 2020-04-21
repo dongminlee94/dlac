@@ -19,6 +19,7 @@ class Agent(object):
                 obs_dim,
                 act_dim,
                 act_limit,
+                device,
                 steps=0,
                 gamma=0.99,
                 lam=0.97,
@@ -42,6 +43,7 @@ class Agent(object):
       self.obs_dim = obs_dim
       self.act_dim = act_dim
       self.act_limit = act_limit
+      self.device = device
       self.steps = steps 
       self.gamma = gamma
       self.lam = lam
@@ -58,8 +60,6 @@ class Agent(object):
       self.kls = kls
       self.entropies = entropies
       self.logger = logger
-
-      self.device = torch.device('cuda', index=self.args.gpu_index) if torch.cuda.is_available() else torch.device('cpu')
 
       # Main network
       self.actor = GaussianPolicy(self.obs_dim, self.act_dim).to(self.device)

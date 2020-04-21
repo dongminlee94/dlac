@@ -30,6 +30,7 @@ parser.add_argument('--dataset', type=str, default='100000')
 parser.add_argument('--epochs', type=str, default='500')
 parser.add_argument('--kld', type=str, default='1e-5')
 args = parser.parse_args()
+device = torch.device('cuda', index=args.gpu_index) if torch.cuda.is_available() else torch.device('cpu')
 
 if args.algo == 'ppo':
     from agents.ppo import Agent
@@ -55,13 +56,13 @@ def main():
 
     # Create an agent
     if args.algo == 'sac':                                                        
-        agent = Agent(env, args, obs_dim, act_dim, act_limit,
+        agent = Agent(env, args, obs_dim, act_dim, act_limit, device,
                     hidden_sizes=(300,300), buffer_size=int(1e6), batch_size=100, alpha=0.2)   
     elif args.algo == 'asac':
-        agent = Agent(env, args, obs_dim, act_dim, act_limit, 
+        agent = Agent(env, args, obs_dim, act_dim, act_limit, device,
                     hidden_sizes=(300,300), buffer_size=int(1e6), batch_size=100, automatic_entropy_tuning=True)
     elif args.algo == 'ppo':
-        agent = Agent(env, args, obs_dim, act_dim, act_limit, sample_size=4000)
+        agent = Agent(env, args, obs_dim, act_dim, act_limit, device, sample_size=4000)
 
     # Create a SummaryWriter object by TensorBoard
     dir_name = 'runs/' + args.env + '/' \
