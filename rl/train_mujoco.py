@@ -32,7 +32,7 @@ if args.algo == 'ppo':
     from agents.ppo import Agent
 elif args.algo == 'sac':
     from agents.sac import Agent
-else args.algo == 'asac': # Automating entropy adjustment on SAC
+elif args.algo == 'asac': # Automating entropy adjustment on SAC
     from agents.sac import Agent
 
 def main():
