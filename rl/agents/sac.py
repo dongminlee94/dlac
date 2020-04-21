@@ -218,7 +218,7 @@ class Agent(object):
                z_next_obs = self.model.encode(torch.Tensor(next_obs).to(self.device))[0]
 
                # Add experience to replay buffer
-               self.replay_buffer.add(z_obs, action, reward, z_next_obs, done)
+               self.replay_buffer.add(z_obs.cpu(), action, reward, z_next_obs.cpu(), done)
             # Start training when the number of experience is greater than batch size
             if self.steps > self.batch_size:
                self.train_model()
