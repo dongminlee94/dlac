@@ -67,7 +67,7 @@ class Agent(object):
       
       # If true, set the trained embedding model 
       if self.args.mode == 'embed':
-         embedding_model_path = os.path.join('../../embedding/asset/' + str(self.args.path))
+         embedding_model_path = os.path.join('../embedding/asset/' + str(self.args.path))
          embedding_model = torch.load(embedding_model_path).to(self.device)
          self.model = DynamicsEmbedding(self.obs_dim, self.obs_dim, self.act_dim).to(self.device)
          self.model.load_state_dict(embedding_model)
