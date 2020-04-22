@@ -12,7 +12,7 @@ from agents.common.networks import *
 
 class Agent(object):
    """
-   An implementation of Soft Actor-Critic (SAC), Automatic entropy adjustment SAC (ASAC) agents.
+   An implementation of Soft Actor-Critic (SAC) agent.
    """
 
    def __init__(self,
@@ -25,9 +25,8 @@ class Agent(object):
                 steps=0,
                 gamma=0.99,
                 alpha=0.2,
-                automatic_entropy_tuning=False,
                 hidden_sizes=(128,128),
-                buffer_size=int(1e4),
+                buffer_size=int(1e6),
                 batch_size=64,
                 actor_lr=1e-3,
                 qf_lr=1e-3,
@@ -49,7 +48,6 @@ class Agent(object):
       self.steps = steps 
       self.gamma = gamma
       self.alpha = alpha
-      self.automatic_entropy_tuning = automatic_entropy_tuning
       self.hidden_sizes = hidden_sizes
       self.buffer_size = buffer_size
       self.batch_size = batch_size
@@ -90,13 +88,6 @@ class Agent(object):
       
       # Experience buffer
       self.replay_buffer = ReplayBuffer(self.obs_dim, self.act_dim, self.buffer_size, self.device)
-
-      # If automatic entropy tuning is True, 
-      # initialize a target entropy, a log alpha and an alpha optimizer
-      if self.automatic_entropy_tuning:
-         self.target_entropy = -np.prod((act_dim,)).item()
-         self.log_alpha = torch.zeros(1, requires_grad=True, device=self.device)
-         self.alpha_optimizer = optim.Adam([self.log_alpha], lr=self.alpha_lr)
 
    def train_model(self):
       batch = self.replay_buffer.sample(self.batch_size)
@@ -157,18 +148,6 @@ class Agent(object):
       actor_loss.backward()
       self.actor_optimizer.step()
 
-      # If automatic entropy tuning is True, update alpha
-      if self.automatic_entropy_tuning:
-         alpha_loss = -(self.log_alpha * (log_pi + self.target_entropy).detach()).mean()
-         self.alpha_optimizer.zero_grad()
-         alpha_loss.backward()
-         self.alpha_optimizer.step()
-
-         self.alpha = self.log_alpha.exp()
-
-         # Save alpha loss
-         self.alpha_losses.append(alpha_loss.item())
-
       # Polyak averaging for target parameter
       soft_target_update(self.qf1, self.qf1_target)
       soft_target_update(self.qf2, self.qf2_target)
@@ -189,36 +168,27 @@ class Agent(object):
       while not (done or step_number == max_step):
          self.steps += 1
          
-         if self.args.mode == 'raw':
-            if self.eval_mode:
+         if self.eval_mode:
+            if self.args.mode == 'raw':
                action, _, _ = self.actor(torch.Tensor(obs).to(self.device))
                action = action.detach().cpu().numpy()
-               next_obs, reward, done, _ = self.env.step(action)
-            else:
+            elif self.args.mode == 'embed':
+               z_obs = self.model.encode(torch.Tensor(obs).to(self.device))[0]
+               z_obs = z_obs.detach().cpu().numpy()
+               action, _, _ = self.actor(torch.Tensor(z_obs).to(self.device))
+               action = action.detach().cpu().numpy()
+               
+            next_obs, reward, done, _ = self.env.step(action)
+         else:
+            if self.args.mode == 'raw':
                # Collect experience (s, a, r, s') using some policy
                _, action, _ = self.actor(torch.Tensor(obs).to(self.device))
                action = action.detach().cpu().numpy()
                next_obs, reward, done, _ = self.env.step(action)
-
-               # Add experience to replay buffer
-               self.replay_buffer.add(obs, action, reward, next_obs, done)
-
-               # Start training when the number of experience is greater than batch size
-               if self.steps > self.batch_size:
-                  self.train_model()
-         elif self.args.mode == 'embed':
-            if self.eval_mode:
-               z_obs = self.model.encode(torch.Tensor(obs).to(self.device))[0]
-               z_obs = z_obs.detach().cpu().numpy()
-
-               action, _, _ = self.actor(torch.Tensor(z_obs).to(self.device))
-               action = action.detach().cpu().numpy()
-               next_obs, reward, done, _ = self.env.step(action)
-            else:
+            elif self.args.mode == 'embed':
                # Collect experience (z_s, a, r, z_s') using some policy
                z_obs = self.model.encode(torch.Tensor(obs).to(self.device))[0]
                z_obs = z_obs.detach().cpu().numpy()
-               
                _, action, _ = self.actor(torch.Tensor(z_obs).to(self.device))
                action = action.detach().cpu().numpy()
                
@@ -226,12 +196,12 @@ class Agent(object):
                z_next_obs = self.model.encode(torch.Tensor(next_obs).to(self.device))[0]
                z_next_obs = z_next_obs.detach().cpu().numpy()
 
-               # Add experience to replay buffer
-               self.replay_buffer.add(z_obs, action, reward, z_next_obs, done)
-               
-               # Start training when the number of experience is greater than batch size
-               if self.steps > self.batch_size:
-                  self.train_model()
+            # Add experience to replay buffer
+            self.replay_buffer.add(z_obs, action, reward, z_next_obs, done)
+            
+            # Start training when the number of experience is greater than batch size
+            if self.steps > self.batch_size:
+               self.train_model()
 
          total_reward += reward
          step_number += 1
@@ -241,6 +211,4 @@ class Agent(object):
       self.logger['LossPi'] = round(np.mean(self.actor_losses), 4)
       self.logger['LossQ1'] = round(np.mean(self.qf1_losses), 4)
       self.logger['LossQ2'] = round(np.mean(self.qf2_losses), 4)
-      if self.automatic_entropy_tuning:
-         self.logger['LossAlpha'] = round(np.mean(self.alpha_losses), 4)
       return step_number, total_reward

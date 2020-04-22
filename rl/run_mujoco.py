@@ -13,10 +13,10 @@ parser.add_argument('--env', type=str, default='Hopper-v2',
                     help='choose an environment between Hopper-v2 and HalfCheetah-v2')
 parser.add_argument('--path', type=str, default=None, 
                     help='path to load the trained embedding model')
-parser.add_argument('--algo', type=str, default='asac', 
-                    help='select an algorithm between ppo, sac and asac')
+parser.add_argument('--algo', type=str, default='sac', 
+                    help='select an algorithm between ppo and sac')
 parser.add_argument('--mode', type=str, default='embed',   # 'embed' or 'raw'
-                    help='select an mode between embedding data and raw data')
+                    help='select an mode between embedded data and raw data')
 parser.add_argument('--seed', type=int, default=0, 
                     help='seed for random number generators')
 parser.add_argument('--iterations', type=int, default=200, 
@@ -26,17 +26,12 @@ parser.add_argument('--steps_per_iter', type=int, default=5000,
 parser.add_argument('--max_step', type=int, default=1000,
                     help='max episode step')
 parser.add_argument('--gpu_index', type=int, default=0, metavar='N')
-parser.add_argument('--dataset', type=str, default='100000')
-parser.add_argument('--epochs', type=str, default='500')
-parser.add_argument('--kld', type=str, default='1e-5')
 args = parser.parse_args()
 device = torch.device('cuda', index=args.gpu_index) if torch.cuda.is_available() else torch.device('cpu')
 
 if args.algo == 'ppo':
     from agents.ppo import Agent
 elif args.algo == 'sac':
-    from agents.sac import Agent
-elif args.algo == 'asac': # Automating entropy adjustment on SAC
     from agents.sac import Agent
 
 def main():
@@ -58,19 +53,12 @@ def main():
     if args.algo == 'sac':                                                        
         agent = Agent(env, args, device, obs_dim, act_dim, act_limit, 
                     hidden_sizes=(300,300), buffer_size=int(1e6), batch_size=100, alpha=0.2)   
-    elif args.algo == 'asac':
-        agent = Agent(env, args, device, obs_dim, act_dim, act_limit, 
-                    hidden_sizes=(300,300), buffer_size=int(1e6), batch_size=100, automatic_entropy_tuning=True)
     elif args.algo == 'ppo':
         agent = Agent(env, args, device, obs_dim, act_dim, act_limit, sample_size=4000)
 
     # Create a SummaryWriter object by TensorBoard
     dir_name = 'runs/' + args.env + '/' \
                                   + args.algo \
-                                  + '_ds_' + args.dataset \
-                                  + '_ep_' + args.epochs \
-                                  + '_kl_' + args.kld \
-                                  + '_' + str(args.seed) \
                                   + '_' + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     writer = SummaryWriter(log_dir=dir_name)
 
@@ -100,8 +88,6 @@ def main():
             # Log experiment result for training steps
             writer.add_scalar('Train/AverageReturns', train_average_return, total_num_steps)
             writer.add_scalar('Train/EpisodeReturns', train_episode_return, total_num_steps)
-            if args.algo == 'asac':
-                writer.add_scalar('Train/Alpha', agent.alpha, total_num_steps)
 
         # Perform the evaluation phase -- no learning
         agent.eval_mode = True
@@ -139,14 +125,11 @@ def main():
                 os.mkdir('./asset')
             
             ckpt_path = os.path.join('./asset/' + args.env + '_' + args.algo \
-                                                                 + '_ds_' + args.dataset \
-                                                                 + '_ep_' + args.epochs \
-                                                                 + '_kl_' + args.kld \
-                                                                 + '_i_' + str(i) \
-                                                                 + '_st_' + str(total_num_steps) \
-                                                                 + '_tr_' + str(round(train_average_return, 2)) \
-                                                                 + '_er_' + str(round(eval_average_return, 2)) \
-                                                                 + '_t_' + str(int(time.time() - start_time)) + '.pt')
+                                                           + '_i_' + str(i) \
+                                                           + '_st_' + str(total_num_steps) \
+                                                           + '_tr_' + str(round(train_average_return, 2)) \
+                                                           + '_er_' + str(round(eval_average_return, 2)) \
+                                                           + '_t_' + str(int(time.time() - start_time)) + '.pt')
             
             torch.save(agent.actor.state_dict(), ckpt_path)
 

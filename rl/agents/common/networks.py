@@ -168,6 +168,9 @@ class ReparamGaussianPolicy(MLP):
         return mu, pi, log_pi
 
 
+"""
+Embedding Model
+"""
 class DynamicsEmbedding(nn.Module):
     def __init__(self, 
                  input_size, 
