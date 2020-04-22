@@ -183,23 +183,30 @@ class Agent(object):
                _, action, _ = self.actor(torch.Tensor(obs).to(self.device))
                action = action.detach().cpu().numpy()
                next_obs, reward, done, _ = self.env.step(action)
+
+               # Add experience to replay buffer
+               self.replay_buffer.add(obs, action, reward, next_obs, done)
+               
+               # Start training when the number of experience is greater than batch size
+               if self.steps > self.batch_size:
+                  self.train_model()
             elif self.args.mode == 'embed':
                # Collect experience (z_s, a, r, z_s') using some policy
-               obs = self.model.encode(torch.Tensor(obs).to(self.device))[0]
-               obs = obs.detach().cpu().numpy()
-               _, action, _ = self.actor(torch.Tensor(obs).to(self.device))
+               z_obs = self.model.encode(torch.Tensor(z_obs).to(self.device))[0]
+               z_obs = obs.detach().cpu().numpy()
+               _, action, _ = self.actor(torch.Tensor(z_obs).to(self.device))
                action = action.detach().cpu().numpy()
                
                next_obs, reward, done, _ = self.env.step(action)
-               next_obs = self.model.encode(torch.Tensor(next_obs).to(self.device))[0]
-               next_obs = next_obs.detach().cpu().numpy()
+               z_next_obs = self.model.encode(torch.Tensor(next_obs).to(self.device))[0]
+               z_next_obs = z_next_obs.detach().cpu().numpy()
 
-            # Add experience to replay buffer
-            self.replay_buffer.add(obs, action, reward, next_obs, done)
-            
-            # Start training when the number of experience is greater than batch size
-            if self.steps > self.batch_size:
-               self.train_model()
+               # Add experience to replay buffer
+               self.replay_buffer.add(z_obs, action, reward, z_next_obs, done)
+               
+               # Start training when the number of experience is greater than batch size
+               if self.steps > self.batch_size:
+                  self.train_model()
 
          total_reward += reward
          step_number += 1
