@@ -52,14 +52,15 @@ def main():
     # Create an agent
     if args.algo == 'sac':                                                        
         agent = Agent(env, args, device, obs_dim, act_dim, act_limit, 
-                    hidden_sizes=(300,300), buffer_size=int(1e6), batch_size=100, alpha=0.2)   
+                      hidden_sizes=(128,128), buffer_size=int(1e6), batch_size=100, 
+                      alpha=0.2, actor_lr=1e-3, qf_lr=1e-3)   
     elif args.algo == 'ppo':
         agent = Agent(env, args, device, obs_dim, act_dim, act_limit, sample_size=4000)
 
     # Create a SummaryWriter object by TensorBoard
     dir_name = 'runs/' + args.env + '/' \
                                   + args.algo \
-                                  + '_' + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+                                  + '_hs_128_' + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     writer = SummaryWriter(log_dir=dir_name)
 
     start_time = time.time()
@@ -120,18 +121,18 @@ def main():
         print('---------------------------------------')
 
         # Save a training model
-        if (i > 0) and (i % 10 == 0):
-            if not os.path.exists('./asset'):
-                os.mkdir('./asset')
+        # if (i > 0) and (i % 10 == 0):
+        #     if not os.path.exists('./asset'):
+        #         os.mkdir('./asset')
             
-            ckpt_path = os.path.join('./asset/' + args.env + '_' + args.algo \
-                                                           + '_i_' + str(i) \
-                                                           + '_st_' + str(total_num_steps) \
-                                                           + '_tr_' + str(round(train_average_return, 2)) \
-                                                           + '_er_' + str(round(eval_average_return, 2)) \
-                                                           + '_t_' + str(int(time.time() - start_time)) + '.pt')
+        #     ckpt_path = os.path.join('./asset/' + args.env + '_' + args.algo \
+        #                                                    + '_i_' + str(i) \
+        #                                                    + '_st_' + str(total_num_steps) \
+        #                                                    + '_tr_' + str(round(train_average_return, 2)) \
+        #                                                    + '_er_' + str(round(eval_average_return, 2)) \
+        #                                                    + '_t_' + str(int(time.time() - start_time)) + '.pt')
             
-            torch.save(agent.actor.state_dict(), ckpt_path)
+        #     torch.save(agent.actor.state_dict(), ckpt_path)
 
 if __name__ == "__main__":
     main()

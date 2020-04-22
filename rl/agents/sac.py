@@ -30,7 +30,6 @@ class Agent(object):
                 batch_size=64,
                 actor_lr=1e-3,
                 qf_lr=1e-3,
-                alpha_lr=1e-3,
                 eval_mode=False,
                 actor_losses=list(),
                 qf1_losses=list(),
@@ -53,7 +52,6 @@ class Agent(object):
       self.batch_size = batch_size
       self.actor_lr = actor_lr
       self.qf_lr = qf_lr
-      self.alpha_lr = alpha_lr
       self.eval_mode = eval_mode
       self.actor_losses = actor_losses
       self.qf1_losses = qf1_losses
