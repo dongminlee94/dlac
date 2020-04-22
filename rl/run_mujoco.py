@@ -60,6 +60,7 @@ def main():
     # Create a SummaryWriter object by TensorBoard
     dir_name = 'runs/' + args.env + '/' \
                                   + args.algo \
+                                  + args.mode \
                                   + '_hs_128_' + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     writer = SummaryWriter(log_dir=dir_name)
 
@@ -126,6 +127,7 @@ def main():
         #         os.mkdir('./asset')
             
         #     ckpt_path = os.path.join('./asset/' + args.env + '_' + args.algo \
+        #                                                    + '_' + args.mode \
         #                                                    + '_i_' + str(i) \
         #                                                    + '_st_' + str(total_num_steps) \
         #                                                    + '_tr_' + str(round(train_average_return, 2)) \
