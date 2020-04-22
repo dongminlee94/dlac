@@ -194,7 +194,7 @@ class Agent(object):
             elif self.args.mode == 'embed':
                # Collect experience (z_s, a, r, z_s') using some policy
                z_obs = self.model.encode(torch.Tensor(obs).to(self.device))[0]
-               z_obs = obs.detach().cpu().numpy()
+               z_obs = z_obs.detach().cpu().numpy()
 
                _, action, _ = self.actor(torch.Tensor(z_obs).to(self.device))
                action = action.detach().cpu().numpy()
