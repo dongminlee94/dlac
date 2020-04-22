@@ -1,1 +1,1 @@
-# Embedding Reinforecement Learning
+# Dynamics-adaptive Embeddings for Actor-Critic (DEAC)
