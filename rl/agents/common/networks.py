@@ -100,8 +100,6 @@ class ReparamGaussianPolicy(MLP):
                  hidden_sizes=(64,64),
                  activation=F.relu,
                  action_scale=1.0,
-                 log_type='log',
-                 q=1.5,
     ):
         super(ReparamGaussianPolicy, self).__init__(
             input_size=input_size,
@@ -117,8 +115,6 @@ class ReparamGaussianPolicy(MLP):
         self.mu_layer = nn.Linear(in_size, output_size)
         self.log_std_layer = nn.Linear(in_size, output_size)
         self.action_scale = action_scale
-        self.log_type = log_type
-        self.q = 2.0 - q
 
     def clip_but_pass_gradient(self, x, l=-1., u=1.):
         clip_up = (x > u).float()
@@ -130,17 +126,9 @@ class ReparamGaussianPolicy(MLP):
         mu = torch.tanh(mu)
         pi = torch.tanh(pi)
         # To avoid evil machine precision error, strictly clip 1-pi**2 to [0,1] range.
-        if self.log_type == 'log':
-            log_pi -= torch.sum(torch.log(self.clip_but_pass_gradient(1 - pi.pow(2), l=0., u=1.) + 1e-6), dim=-1)
-        elif self.log_type == 'log-q':
-            log_pi -= torch.log(self.clip_but_pass_gradient(1 - pi.pow(2), l=0., u=1.) + 1e-6)
+        log_pi -= torch.sum(torch.log(self.clip_but_pass_gradient(1 - pi.pow(2), l=0., u=1.) + 1e-6), dim=-1)
         return mu, pi, log_pi
 
-    def tsallis_entropy_log_q(self, x, q):
-        safe_x = torch.max(x, torch.Tensor([1e-6]).to(device))
-        log_q_x = torch.log(safe_x) if q==1. else (safe_x.pow(1-q)-1)/(1-q)
-        return log_q_x.sum(dim=-1)
-        
     def forward(self, x):
         x = super(ReparamGaussianPolicy, self).forward(x)
         
@@ -152,15 +140,8 @@ class ReparamGaussianPolicy(MLP):
         # https://pytorch.org/docs/stable/distributions.html#normal
         dist = Normal(mu, std)
         pi = dist.rsample() # reparameterization trick (mean + std * N(0,1))
-
-        if self.log_type == 'log':
-            log_pi = dist.log_prob(pi).sum(dim=-1)
-            mu, pi, log_pi = self.apply_squashing_func(mu, pi, log_pi)
-        elif self.log_type == 'log-q':
-            log_pi = dist.log_prob(pi)
-            mu, pi, log_pi = self.apply_squashing_func(mu, pi, log_pi)
-            exp_log_pi = torch.exp(log_pi)
-            log_pi = self.tsallis_entropy_log_q(exp_log_pi, self.q)
+        log_pi = dist.log_prob(pi).sum(dim=-1)
+        mu, pi, log_pi = self.apply_squashing_func(mu, pi, log_pi)
         
         # make sure actions are in correct range
         mu = mu * self.action_scale
