@@ -12,8 +12,7 @@ from agents.common.networks import *
 
 class Agent(object):
    """
-   An implementation of Soft Actor-Critic (SAC), Automatic entropy adjustment SAC (ASAC), 
-   Tsallis Actor-Critic (TAC) and Automatic entropy adjustment TAC (ATAC) agents.
+   An implementation of Soft Actor-Critic (SAC), Automatic entropy adjustment SAC (ASAC) agents.
    """
 
    def __init__(self,
@@ -203,6 +202,10 @@ class Agent(object):
 
                # Add experience to replay buffer
                self.replay_buffer.add(obs, action, reward, next_obs, done)
+
+               # Start training when the number of experience is greater than batch size
+               if self.steps > self.batch_size:
+                  self.train_model()
          elif self.args.mode == 'embed':
             if self.eval_mode:
                z_obs = self.model.encode(torch.Tensor(obs).to(self.device))[0]
