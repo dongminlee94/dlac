@@ -59,7 +59,7 @@ def main():
     dir_name = 'runs/' + args.env + '/' \
                                   + 'ds_' + str(np.array(dataset).shape[0]) \
                                   + '_ep_' + str(args.epochs) \
-                                  + '_1e-4_t_' + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+                                  + '_1e-5_t_' + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     writer = SummaryWriter(log_dir=dir_name)
 
     start_time = time.time()
@@ -86,7 +86,7 @@ def main():
             kld = - 0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp()).to(device)
 
             # Update VAE model parameters
-            loss = reconst + 1e-4 * kld
+            loss = reconst + 1e-5 * kld
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -129,7 +129,7 @@ def main():
     ckpt_path = os.path.join('./asset/' + args.env \
                                          + '_ds_' + str(np.array(dataset).shape[0]) \
                                          + '_ep_' + str(args.epochs) \
-                                         + '_1e-4_t_' + str(int(time.time() - start_time)) 
+                                         + '_1e-5_t_' + str(int(time.time() - start_time)) 
                                          + '.pt')
     
     torch.save(model.state_dict(), ckpt_path)
