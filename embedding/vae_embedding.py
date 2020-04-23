@@ -15,7 +15,7 @@ from model import DynamicsEmbedding
 
 # Configurations
 parser = argparse.ArgumentParser(description='Dynamics-adaptive Embedding')
-parser.add_argument('--env', type=str, default='Hopper-v2', 
+parser.add_argument('--env', type=str, default='HalfCheetah-v2', 
                     help='choose an environment between Hopper-v2 and HalfCheetah-v2')
 parser.add_argument('--path', type=str, default=None, 
                     help='path to load the dataset')
@@ -59,7 +59,7 @@ def main():
     dir_name = 'runs/' + args.env + '/' \
                                   + 'ds_' + str(np.array(dataset).shape[0]) \
                                   + '_ep_' + str(args.epochs) \
-                                  + '_1e-5_t_' + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+                                  + '_1e-4_t_' + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     writer = SummaryWriter(log_dir=dir_name)
 
     start_time = time.time()
@@ -86,7 +86,7 @@ def main():
             kld = - 0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp()).to(device)
 
             # Update VAE model parameters
-            loss = reconst + 1e-5 * kld
+            loss = reconst + 1e-4 * kld
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
@@ -129,9 +129,7 @@ def main():
     ckpt_path = os.path.join('./asset/' + args.env \
                                          + '_ds_' + str(np.array(dataset).shape[0]) \
                                          + '_ep_' + str(args.epochs) \
-                                         + '_al_' + str(round(average_loss, 2)) \
-                                         + '_el_' + str(round(loss.item(), 2)) \
-                                         + '_1e-5_t_' + str(int(time.time() - start_time)) 
+                                         + '_1e-4_t_' + str(int(time.time() - start_time)) 
                                          + '.pt')
     
     torch.save(model.state_dict(), ckpt_path)

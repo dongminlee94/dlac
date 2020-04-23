@@ -9,7 +9,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 # Configurations
 parser = argparse.ArgumentParser(description='RL algorithms with PyTorch in MuJoCo environments')
-parser.add_argument('--env', type=str, default='Hopper-v2', 
+parser.add_argument('--env', type=str, default='HalfCheetah-v2', 
                     help='choose an environment between Hopper-v2 and HalfCheetah-v2')
 parser.add_argument('--path', type=str, default=None, 
                     help='path to load the trained embedding model')
