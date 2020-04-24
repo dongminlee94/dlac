@@ -9,9 +9,6 @@ def identity(x):
     return x
 
 
-"""
-PPO critic
-"""
 class MLP(nn.Module):
     def __init__(self, 
                  input_size, 
@@ -58,33 +55,6 @@ class FlattenMLP(MLP):
     def forward(self, x, a):
         q = torch.cat([x,a], dim=-1)
         return super(FlattenMLP, self).forward(q)
-
-
-"""
-PPO actor
-"""
-class GaussianPolicy(MLP):
-    def __init__(self, 
-                 input_size, 
-                 output_size, 
-                 hidden_sizes=(64,64),
-                 activation=torch.tanh,
-    ):
-        super(GaussianPolicy, self).__init__(
-            input_size=input_size,
-            output_size=output_size,
-            hidden_sizes=hidden_sizes,
-            activation=activation,
-        )
-
-    def forward(self, x):
-        mu = super(GaussianPolicy, self).forward(x)
-        log_std = torch.zeros_like(mu)
-        std = torch.exp(log_std)
-        
-        dist = Normal(mu, std)
-        pi = dist.sample()
-        return mu, std, dist, pi
 
 
 """

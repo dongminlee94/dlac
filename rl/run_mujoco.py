@@ -7,14 +7,14 @@ import numpy as np
 import torch
 from torch.utils.tensorboard import SummaryWriter
 
+from torch.sac import Agent
+
 # Configurations
 parser = argparse.ArgumentParser(description='RL algorithms with PyTorch in MuJoCo environments')
-parser.add_argument('--env', type=str, default='HalfCheetah-v2', 
+parser.add_argument('--env', type=str, default='Hopper-v2', 
                     help='choose an environment between Hopper-v2 and HalfCheetah-v2')
 parser.add_argument('--path', type=str, default=None, 
                     help='path to load the trained embedding model')
-parser.add_argument('--algo', type=str, default='sac', 
-                    help='select an algorithm between ppo and sac')
 parser.add_argument('--mode', type=str, default='embed',   # 'embed' or 'raw'
                     help='select an mode between embedded data and raw data')
 parser.add_argument('--iterations', type=int, default=200, 
@@ -27,10 +27,6 @@ parser.add_argument('--gpu_index', type=int, default=0, metavar='N')
 args = parser.parse_args()
 device = torch.device('cuda', index=args.gpu_index) if torch.cuda.is_available() else torch.device('cpu')
 
-if args.algo == 'ppo':
-    from agents.ppo import Agent
-elif args.algo == 'sac':
-    from agents.sac import Agent
 
 def main():
     """Main."""
@@ -47,19 +43,15 @@ def main():
     np.random.seed(40)
     torch.manual_seed(40)
 
-    # Create an agent
-    if args.algo == 'sac':                                                        
-        agent = Agent(env, args, device, obs_dim, act_dim, act_limit, 
-                      hidden_sizes=(400,400), buffer_size=int(1e6), batch_size=100, 
-                      alpha=0.2, actor_lr=1e-3, qf_lr=1e-3)   
-    elif args.algo == 'ppo':
-        agent = Agent(env, args, device, obs_dim, act_dim, act_limit, sample_size=4000)
+    # Create an agent                                                   
+    agent = Agent(env, args, device, obs_dim, act_dim, act_limit, 
+                  hidden_sizes=(300,300), buffer_size=int(1e6), batch_size=100, 
+                  alpha=0.2, actor_lr=1e-3, qf_lr=1e-3)   
 
     # Create a SummaryWriter object by TensorBoard
     dir_name = 'runs/' + args.env + '/' \
-                                  + args.algo \
-                                  + '_' + args.mode \
-                                  + '_hs_400_alr_1e-3_clr_1e-3_' + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+                       + '_' + args.mode \
+                       + '_hs_300_alr_1e-3_clr_1e-3_' + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     writer = SummaryWriter(log_dir=dir_name)
 
     start_time = time.time()
@@ -120,17 +112,17 @@ def main():
         print('---------------------------------------')
 
         # Save a training model
-        # if (i > 0) and (i % 10 == 0):
+        # if (i > 0) and (i % 20 == 0):
         #     if not os.path.exists('./asset'):
         #         os.mkdir('./asset')
             
-        #     ckpt_path = os.path.join('./asset/' + args.env + '_' + args.algo \
-        #                                                    + '_' + args.mode \
-        #                                                    + '_i_' + str(i) \
-        #                                                    + '_st_' + str(total_num_steps) \
-        #                                                    + '_tr_' + str(round(train_average_return, 2)) \
-        #                                                    + '_er_' + str(round(eval_average_return, 2)) \
-        #                                                    + '_t_' + str(int(time.time() - start_time)) + '.pt')
+        #     ckpt_path = os.path.join('./asset/' + args.env \
+        #                                         + '_' + args.mode \
+        #                                         + '_i_' + str(i) \
+        #                                         + '_st_' + str(total_num_steps) \
+        #                                         + '_tr_' + str(round(train_average_return, 2)) \
+        #                                         + '_er_' + str(round(eval_average_return, 2)) \
+        #                                         + '_t_' + str(int(time.time() - start_time)) + '.pt')
             
         #     torch.save(agent.actor.state_dict(), ckpt_path)
 

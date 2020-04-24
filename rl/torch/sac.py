@@ -5,14 +5,14 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 
-from agents.common.utils import *
-from agents.common.buffer import *
-from agents.common.networks import *
+from buffers import *
+from networks import *
 
 
 class Agent(object):
    """
    An implementation of Soft Actor-Critic (SAC) agent.
+   https://arxiv.org/abs/1801.01290
    """
 
    def __init__(self,
@@ -25,9 +25,9 @@ class Agent(object):
                 steps=0,
                 gamma=0.99,
                 alpha=0.2,
-                hidden_sizes=(128,128),
+                hidden_sizes=(300,300),
                 buffer_size=int(1e6),
-                batch_size=64,
+                batch_size=100,
                 actor_lr=1e-3,
                 qf_lr=1e-3,
                 eval_mode=False,
@@ -69,8 +69,8 @@ class Agent(object):
       self.qf2_target = FlattenMLP(self.obs_dim+self.act_dim, 1, hidden_sizes=self.hidden_sizes).to(self.device)
       
       # Initialize target parameters to match main parameters
-      hard_target_update(self.qf1, self.qf1_target)
-      hard_target_update(self.qf2, self.qf2_target)
+      self.hard_target_update(self.qf1, self.qf1_target)
+      self.hard_target_update(self.qf2, self.qf2_target)
 
       # If ture, set the trained embedding model 
       if self.args.mode == 'embed':
@@ -86,6 +86,13 @@ class Agent(object):
       
       # Experience buffer
       self.replay_buffer = ReplayBuffer(self.obs_dim, self.act_dim, self.buffer_size, self.device)
+
+   def hard_target_update(self, main, target):
+        target.load_state_dict(main.state_dict())
+
+   def soft_target_update(self, main, target, tau=0.005):
+      for main_param, target_param in zip(main.parameters(), target.parameters()):
+         target_param.data.copy_(tau*main_param.data + (1.0-tau)*target_param.data)
 
    def train_model(self):
       batch = self.replay_buffer.sample(self.batch_size)
@@ -147,8 +154,8 @@ class Agent(object):
       self.actor_optimizer.step()
 
       # Polyak averaging for target parameter
-      soft_target_update(self.qf1, self.qf1_target)
-      soft_target_update(self.qf2, self.qf2_target)
+      self.soft_target_update(self.qf1, self.qf1_target)
+      self.soft_target_update(self.qf2, self.qf2_target)
       
       # Save losses
       self.actor_losses.append(actor_loss.item())
@@ -175,7 +182,6 @@ class Agent(object):
                z_obs = z_obs.detach().cpu().numpy()
                action, _, _ = self.actor(torch.Tensor(z_obs).to(self.device))
                action = action.detach().cpu().numpy()
-               
             next_obs, reward, done, _ = self.env.step(action)
          else:
             if self.args.mode == 'raw':

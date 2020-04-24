@@ -19,8 +19,8 @@ parser.add_argument('--env', type=str, default='Hopper-v2',
                     help='choose an environment between Hopper-v2 and HalfCheetah-v2')
 parser.add_argument('--path', type=str, default=None, 
                     help='path to load the dataset')
-parser.add_argument('--epochs', type=int, default=1000, 
-                    help='number of epochs to train (default: 1000)')
+parser.add_argument('--epochs', type=int, default=10000, 
+                    help='number of epochs to train (default: 10000)')
 parser.add_argument('--batch_size', type=int, default=128, 
                     help='input batch size for training (default: 128)')
 parser.add_argument('--gpu_index', type=int, default=0, metavar='N')
@@ -120,17 +120,17 @@ def main():
         writer.add_scalar('Train/AverageKL', average_kld, epoch)
         writer.add_scalar('Train/EpochKL', kld, epoch)
 
-    # Save the trained model
-    if not os.path.exists('./asset'):
-        os.mkdir('./asset')
-    
-    ckpt_path = os.path.join('./asset/' + args.env \
-                                         + '_ds_' + str(np.array(dataset).shape[0]) \
-                                         + '_ep_' + str(args.epochs) \
-                                         + '_t_' + str(int(time.time() - start_time)) 
-                                         + '.pt')
-    
-    torch.save(model.state_dict(), ckpt_path)
+        # Save the trained model
+        if not os.path.exists('./asset'):
+            os.mkdir('./asset')
+        
+        if (epoch + 1) % 500 == 0:
+            ckpt_path = os.path.join('./asset/' + args.env \
+                                                + '_ds_' + str(np.array(dataset).shape[0]) \
+                                                + '_ep_' + str(epoch + 1) \
+                                                + '.pt')
+            
+            torch.save(model.state_dict(), ckpt_path)
 
 if __name__ == "__main__":
     main()
