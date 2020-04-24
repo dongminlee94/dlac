@@ -17,7 +17,7 @@ parser.add_argument('--algo', type=str, default='sac',
                     help='select an algorithm between ppo and sac')
 parser.add_argument('--mode', type=str, default='embed',   # 'embed' or 'raw'
                     help='select an mode between embedded data and raw data')
-parser.add_argument('--seed', type=int, default=0, 
+parser.add_argument('--seed', type=int, default=40, 
                     help='seed for random number generators')
 parser.add_argument('--iterations', type=int, default=200, 
                     help='iterations to run and train agent')
