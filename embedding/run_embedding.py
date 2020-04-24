@@ -15,14 +15,12 @@ from model import DynamicsEmbedding
 
 # Configurations
 parser = argparse.ArgumentParser(description='Dynamics-adaptive Embedding')
-parser.add_argument('--env', type=str, default='HalfCheetah-v2', 
+parser.add_argument('--env', type=str, default='Hopper-v2', 
                     help='choose an environment between Hopper-v2 and HalfCheetah-v2')
 parser.add_argument('--path', type=str, default=None, 
                     help='path to load the dataset')
-parser.add_argument('--seed', type=int, default=0, 
-                    help='seed for random number generators (default: 0)')
-parser.add_argument('--epochs', type=int, default=500, 
-                    help='number of epochs to train (default: 500)')
+parser.add_argument('--epochs', type=int, default=1000, 
+                    help='number of epochs to train (default: 1000)')
 parser.add_argument('--batch_size', type=int, default=128, 
                     help='input batch size for training (default: 128)')
 parser.add_argument('--gpu_index', type=int, default=0, metavar='N')
@@ -39,8 +37,8 @@ def main():
         act_dim = 6
 
     # Set a random seed
-    np.random.seed(args.seed)
-    torch.manual_seed(args.seed)
+    np.random.seed(40)
+    torch.manual_seed(40)
 
     # Load dataset
     dataset = pickle.load(open(args.path, "rb"))
@@ -59,7 +57,7 @@ def main():
     dir_name = 'runs/' + args.env + '/' \
                                   + 'ds_' + str(np.array(dataset).shape[0]) \
                                   + '_ep_' + str(args.epochs) \
-                                  + '_1e-4_t_' + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+                                  + '_t_' + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     writer = SummaryWriter(log_dir=dir_name)
 
     start_time = time.time()
@@ -129,7 +127,7 @@ def main():
     ckpt_path = os.path.join('./asset/' + args.env \
                                          + '_ds_' + str(np.array(dataset).shape[0]) \
                                          + '_ep_' + str(args.epochs) \
-                                         + '_1e-4_t_' + str(int(time.time() - start_time)) 
+                                         + '_t_' + str(int(time.time() - start_time)) 
                                          + '.pt')
     
     torch.save(model.state_dict(), ckpt_path)
