@@ -52,8 +52,8 @@ def main():
     # Create an agent
     if args.algo == 'sac':                                                        
         agent = Agent(env, args, device, obs_dim, act_dim, act_limit, 
-                      hidden_sizes=(300,300), buffer_size=int(1e6), batch_size=100, 
-                      alpha=0.2, actor_lr=1e-4, qf_lr=3e-4)   
+                      hidden_sizes=(400,400), buffer_size=int(1e6), batch_size=100, 
+                      alpha=0.2, actor_lr=3e-4, qf_lr=3e-4)   
     elif args.algo == 'ppo':
         agent = Agent(env, args, device, obs_dim, act_dim, act_limit, sample_size=4000)
 
@@ -61,7 +61,7 @@ def main():
     dir_name = 'runs/' + args.env + '/' \
                                   + args.algo \
                                   + '_' + args.mode \
-                                  + '_hs_300_alr_1e-4_clr_3e-4_' + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+                                  + '_hs_400_alr_3e-4_clr_3e-4_' + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     writer = SummaryWriter(log_dir=dir_name)
 
     start_time = time.time()
