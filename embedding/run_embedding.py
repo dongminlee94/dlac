@@ -121,10 +121,10 @@ def main():
         writer.add_scalar('Train/EpochKL', kld, epoch)
 
         # Save the trained model
-        if not os.path.exists('./asset'):
-            os.mkdir('./asset')
-        
         if (epoch + 1) % 500 == 0:
+            if not os.path.exists('./asset'):
+                os.mkdir('./asset')
+            
             ckpt_path = os.path.join('./asset/' + args.env \
                                                 + '_ds_' + str(np.array(dataset).shape[0]) \
                                                 + '_ep_' + str(epoch + 1) \
