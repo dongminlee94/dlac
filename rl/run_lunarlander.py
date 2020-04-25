@@ -13,7 +13,7 @@ from agent.sac import Agent
 parser = argparse.ArgumentParser(description='SAC algorithm with PyTorch in LunarLanderContinuous environment')
 parser.add_argument('--path', type=str, default=None, 
                     help='path to load the trained embedding model')
-parser.add_argument('--mode', type=str, default='embed',   # 'embed' or 'raw'
+parser.add_argument('--mode', type=str, default='raw',   # 'embed' or 'raw'
                     help='select an mode between embedded data and raw data')
 parser.add_argument('--training_eps', type=int, default=2000, 
                     help='training episode number')
@@ -42,7 +42,7 @@ def main():
     # Create an agent
     agent = Agent(env, args, device, obs_dim, act_dim, act_limit, 
                   hidden_sizes=(300,300), buffer_size=int(1e6), batch_size=100, 
-                  alpha=0.2, actor_lr=1e-3, qf_lr=1e-3)
+                  alpha=0.1, actor_lr=1e-3, qf_lr=1e-3)
 
     # Create a SummaryWriter object by TensorBoard
     dir_name = 'runs/' + args.mode + '_hs_300_alr_1e-3_clr_1e-3'
