@@ -5,8 +5,8 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 
-from buffers import ReplayBuffer
-from networks import *
+from agent.buffers import *
+from agent.networks import *
 
 
 class Agent(object):
