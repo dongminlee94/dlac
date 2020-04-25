@@ -47,7 +47,7 @@ def main():
                   alpha=0.2, actor_lr=1e-4, qf_lr=1e-4)   
 
     # Create a SummaryWriter object by TensorBoard
-    dir_name = 'runs/' + args.mode + '_hs_300_alr_1e-4_clr_1e-4'
+    dir_name = 'runs/' + args.env + '/' + args.mode + '_hs_300_alr_1e-4_clr_1e-4'
     writer = SummaryWriter(log_dir=dir_name)
 
     start_time = time.time()
