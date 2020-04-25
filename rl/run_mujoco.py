@@ -7,12 +7,10 @@ import numpy as np
 import torch
 from torch.utils.tensorboard import SummaryWriter
 
-from torch.sac import Agent
+from agent.sac import Agent
 
 # Configurations
-parser = argparse.ArgumentParser(description='RL algorithms with PyTorch in MuJoCo environments')
-parser.add_argument('--env', type=str, default='Hopper-v2', 
-                    help='choose an environment between Hopper-v2 and HalfCheetah-v2')
+parser = argparse.ArgumentParser(description='SAC algorithm with PyTorch in Hopper environment')
 parser.add_argument('--path', type=str, default=None, 
                     help='path to load the trained embedding model')
 parser.add_argument('--mode', type=str, default='embed',   # 'embed' or 'raw'
@@ -31,7 +29,7 @@ device = torch.device('cuda', index=args.gpu_index) if torch.cuda.is_available()
 def main():
     """Main."""
     # Initialize environment
-    env = gym.make(args.env)
+    env = gym.make('Hopper-v2')
     obs_dim = env.observation_space.shape[0]
     act_dim = env.action_space.shape[0]
     act_limit = env.action_space.high[0]
@@ -49,9 +47,8 @@ def main():
                   alpha=0.2, actor_lr=1e-3, qf_lr=1e-3)   
 
     # Create a SummaryWriter object by TensorBoard
-    dir_name = 'runs/' + args.env + '/' \
-                       + '_' + args.mode \
-                       + '_hs_300_alr_1e-3_clr_1e-3_' + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+    dir_name = 'runs/' + args.mode \
+                       + '_hs_300_alr_1e-3_clr_1e-3' # + datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     writer = SummaryWriter(log_dir=dir_name)
 
     start_time = time.time()
@@ -116,8 +113,7 @@ def main():
         #     if not os.path.exists('./asset'):
         #         os.mkdir('./asset')
             
-        #     ckpt_path = os.path.join('./asset/' + args.env \
-        #                                         + '_' + args.mode \
+        #     ckpt_path = os.path.join('./asset/' + args.mode \
         #                                         + '_i_' + str(i) \
         #                                         + '_st_' + str(total_num_steps) \
         #                                         + '_tr_' + str(round(train_average_return, 2)) \

@@ -14,7 +14,7 @@ from model import DynamicsEmbedding
 
 
 # Configurations
-parser = argparse.ArgumentParser(description='Dynamics-adaptive Embedding')
+parser = argparse.ArgumentParser(description='Dynamics-adaptive Embeddings')
 parser.add_argument('--env', type=str, default='Hopper-v2', 
                     help='choose an environment between Hopper-v2 and HalfCheetah-v2')
 parser.add_argument('--path', type=str, default=None, 

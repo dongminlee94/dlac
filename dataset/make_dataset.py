@@ -5,11 +5,11 @@ import argparse
 import numpy as np
 
 # Configurations
-parser = argparse.ArgumentParser(description='Make a dataset in MuJoCo environment from a uniformly random policy')
-parser.add_argument('--env', type=str, default='Hopper-v2', 
-                    help='choose an environment between Hopper-v2 and HalfCheetah-v2')
-parser.add_argument('--path', type=str, default=None,
-                    help='path to save the dataset')
+parser = argparse.ArgumentParser(description='Make a dataset from a uniformly random policy')
+parser.add_argument('--env', type=str, default='LunarLanderContinuous-v2', 
+                    help='choose an environment between LunarLanderContinuous-v2 and Hopper-v2')
+parser.add_argument('--name', type=str, default=None,
+                    help='name to save the dataset')
 parser.add_argument('--d_size', type=int, default=100000,
                     help='dataset size')
 args = parser.parse_args()
@@ -22,8 +22,8 @@ print('State dimension:', obs_dim)
 print('Action dimension:', act_dim)
 
 # Set a random seed
-env.seed(0)
-np.random.seed(0)
+env.seed(40)
+np.random.seed(40)
 
 dataset = []
 
@@ -45,10 +45,10 @@ while True:
  
     # Save dataset
     if temp.shape[0] >= args.d_size:
-        pickle.dump(dataset, open(args.path, "wb"))
+        pickle.dump(dataset, open(args.name, "wb"))
         break
 
 # Load dataset
-dataset = pickle.load(open(args.path, "rb"))
+dataset = pickle.load(open(args.name, "rb"))
 dataset = np.array(dataset)
 print(dataset.shape)
