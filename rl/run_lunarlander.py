@@ -21,6 +21,7 @@ parser.add_argument('--eval_per_train', type=int, default=100,
                     help='evaluation number per training')
 parser.add_argument('--evaluation_eps', type=int, default=100,
                     help='evaluation episode number')
+parser.add_argument('--a', type=int, default=0.1)
 args = parser.parse_args()
 
 
@@ -42,10 +43,10 @@ def main():
     # Create an agent
     agent = Agent(env, args, device, obs_dim, act_dim, act_limit, 
                   hidden_sizes=(300,300), buffer_size=int(1e6), batch_size=100, 
-                  alpha=0.1, actor_lr=1e-3, qf_lr=1e-3)
+                  alpha=args.a, actor_lr=1e-3, qf_lr=1e-3)
 
     # Create a SummaryWriter object by TensorBoard
-    dir_name = 'runs/' + args.mode + '_hs_300_alr_1e-3_clr_1e-3'
+    dir_name = 'runs/' + args.a + '_hs_300_alr_1e-3_clr_1e-3'
     writer = SummaryWriter(log_dir=dir_name)
 
     start_time = time.time()

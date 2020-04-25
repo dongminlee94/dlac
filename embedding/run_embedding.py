@@ -19,8 +19,8 @@ parser.add_argument('--env', type=str, default='LunarLanderContinuous-v2',
                     help='choose an environment between LunarLanderContinuous-v2 and Hopper-v2')
 parser.add_argument('--path', type=str, default=None, 
                     help='path to load the dataset')
-parser.add_argument('--epochs', type=int, default=1000, 
-                    help='number of epochs to train (default: 1000)')
+parser.add_argument('--epochs', type=int, default=500, 
+                    help='number of epochs to train (default: 500)')
 parser.add_argument('--batch_size', type=int, default=128, 
                     help='input batch size for training (default: 128)')
 parser.add_argument('--gpu_index', type=int, default=0, metavar='N')
