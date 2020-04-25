@@ -15,8 +15,8 @@ from model import DynamicsEmbedding
 
 # Configurations
 parser = argparse.ArgumentParser(description='Dynamics-adaptive Embeddings')
-parser.add_argument('--env', type=str, default='Hopper-v2', 
-                    help='choose an environment between Hopper-v2 and HalfCheetah-v2')
+parser.add_argument('--env', type=str, default='LunarLanderContinuous-v2', 
+                    help='choose an environment between LunarLanderContinuous-v2 and Hopper-v2')
 parser.add_argument('--path', type=str, default=None, 
                     help='path to load the dataset')
 parser.add_argument('--epochs', type=int, default=1000, 
@@ -29,12 +29,12 @@ device = torch.device('cuda', index=args.gpu_index) if torch.cuda.is_available()
 
 def main():
     # Set the shapes of observation space and action space in the environment
-    if args.env == 'Hopper-v2':
+    if args.env == 'LunarLanderContinuous-v2':
+        obs_dim = 8
+        act_dim = 2
+    elif args.env == 'Hopper-v2':
         obs_dim = 11
         act_dim = 3
-    elif args.env == 'HalfCheetah-v2':
-        obs_dim = 17
-        act_dim = 6
 
     # Set a random seed
     np.random.seed(40)
