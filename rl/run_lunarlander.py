@@ -22,7 +22,7 @@ parser.add_argument('--eval_per_train', type=int, default=100,
 parser.add_argument('--evaluation_eps', type=int, default=100,
                     help='evaluation episode number')
 parser.add_argument('--gpu_index', type=int, default=0, metavar='N')
-parser.add_argument('--a', type=int, default=0.1)
+parser.add_argument('--a', type=float, default=0.1)
 args = parser.parse_args()
 device = torch.device('cuda', index=args.gpu_index) if torch.cuda.is_available() else torch.device('cpu')
 
