@@ -44,10 +44,10 @@ def main():
     # Create an agent                                                   
     agent = Agent(env, args, device, obs_dim, act_dim, act_limit, 
                   hidden_sizes=(300,300), buffer_size=int(1e6), batch_size=100, 
-                  alpha=0.2, actor_lr=1e-3, qf_lr=1e-3)   
+                  alpha=0.2, actor_lr=3e-4, qf_lr=1e-3)   
 
     # Create a SummaryWriter object by TensorBoard
-    dir_name = 'runs/' + 'Hopper/' + args.mode + '_hs_300_alr_1e-3_clr_1e-3'
+    dir_name = 'runs/' + 'Hopper/' + args.mode + '_hs_300_alr_3e-4_clr_1e-3'
     writer = SummaryWriter(log_dir=dir_name)
 
     start_time = time.time()
