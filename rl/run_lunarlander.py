@@ -15,14 +15,13 @@ parser.add_argument('--path', type=str, default=None,
                     help='path to load the trained embedding model')
 parser.add_argument('--mode', type=str, default='raw',   # 'embed' or 'raw'
                     help='select an mode between embedded data and raw data')
-parser.add_argument('--training_eps', type=int, default=2000, 
+parser.add_argument('--training_eps', type=int, default=1000, 
                     help='training episode number')
 parser.add_argument('--eval_per_train', type=int, default=100, 
                     help='evaluation number per training')
 parser.add_argument('--evaluation_eps', type=int, default=100,
                     help='evaluation episode number')
 parser.add_argument('--gpu_index', type=int, default=0, metavar='N')
-parser.add_argument('--a', type=float, default=0.1)
 args = parser.parse_args()
 device = torch.device('cuda', index=args.gpu_index) if torch.cuda.is_available() else torch.device('cpu')
 
@@ -45,10 +44,10 @@ def main():
     # Create an agent
     agent = Agent(env, args, device, obs_dim, act_dim, act_limit, 
                   hidden_sizes=(300,300), buffer_size=int(1e6), batch_size=100, 
-                  alpha=args.a, actor_lr=1e-3, qf_lr=1e-3)
+                  alpha=0.3, actor_lr=1e-3, qf_lr=1e-3)
 
     # Create a SummaryWriter object by TensorBoard
-    dir_name = 'runs/' + 'LunarLanderContinuous/' + str(args.a) + '_hs_300_alr_1e-3_clr_1e-3'
+    dir_name = 'runs/' + 'LunarLanderContinuous/' + args.mode + '_hs_300_alr_1e-3_clr_1e-3'
     writer = SummaryWriter(log_dir=dir_name)
 
     start_time = time.time()
