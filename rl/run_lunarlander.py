@@ -13,7 +13,7 @@ from agent.sac import Agent
 parser = argparse.ArgumentParser(description='SAC algorithm with PyTorch in LunarLanderContinuous environment')
 parser.add_argument('--path', type=str, default=None, 
                     help='path to load the trained embedding model')
-parser.add_argument('--mode', type=str, default='raw',   # 'embed' or 'raw'
+parser.add_argument('--mode', type=str, default='embed',   # 'embed' or 'raw'
                     help='select an mode between embedded data and raw data')
 parser.add_argument('--training_eps', type=int, default=1000, 
                     help='training episode number')
