@@ -1,1 +1,1 @@
-# Dynamics-adaptive Embeddings for Actor-Critic (DEAC)
+# Dynamics-adaptive Latent Actor-Critic (DLAC)
