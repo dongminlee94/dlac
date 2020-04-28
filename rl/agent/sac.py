@@ -11,7 +11,7 @@ from agent.networks import *
 
 class Agent(object):
    """
-   An implementation of Soft Actor-Critic (SAC) agent.
+   An implementation of Soft Actor-Critic (SAC) algorithm.
    https://arxiv.org/abs/1801.01290
    """
 

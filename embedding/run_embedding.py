@@ -14,7 +14,7 @@ from model import DynamicsEmbedding
 
 
 # Configurations
-parser = argparse.ArgumentParser(description='Dynamics-adaptive Embeddings')
+parser = argparse.ArgumentParser(description='Dynamics-adaptive Latent Model')
 parser.add_argument('--env', type=str, default='LunarLanderContinuous-v2', 
                     help='choose an environment between LunarLanderContinuous-v2 and Hopper-v2')
 parser.add_argument('--path', type=str, default=None, 

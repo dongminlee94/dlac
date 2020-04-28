@@ -107,19 +107,6 @@ def main():
         print('Time:', int(time.time() - start_time))
         print('---------------------------------------')
 
-        # Save a training model
-        # if (i > 0) and (i % 20 == 0):
-        #     if not os.path.exists('./asset'):
-        #         os.mkdir('./asset')
-            
-        #     ckpt_path = os.path.join('./asset/' + args.mode \
-        #                                         + '_i_' + str(i) \
-        #                                         + '_st_' + str(total_num_steps) \
-        #                                         + '_tr_' + str(round(train_average_return, 2)) \
-        #                                         + '_er_' + str(round(eval_average_return, 2)) \
-        #                                         + '_t_' + str(int(time.time() - start_time)) + '.pt')
-            
-        #     torch.save(agent.actor.state_dict(), ckpt_path)
 
 if __name__ == "__main__":
     main()
