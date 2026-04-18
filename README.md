@@ -10,7 +10,7 @@ This work was partly supported by the Institute for Information & Communications
   title     = {Dynamics-adaptive Latent Actor-Critic: Efficient Deep Reinforcement Learning with a Latent Variable Model},
   journal   = {Korea Computer Congress(KCC)},
   year      = {2020},
-  url       = {https://bi.snu.ac.kr/Publications/Conferences/Domestic/KCC2020/KCC2020_DMLeeJZ.pdf}
+  url       = {https://github.com/dongminlee94/dlac/blob/master/paper/KCC2020_DMLee.pdf}
 }
 ```
 # License
